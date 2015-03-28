@@ -1,0 +1,23 @@
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\bin\Release\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\bin\Release\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Release\CG1.Ex03.Form1.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Release\CG1.Ex03.Properties.Resources.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Release\CG1.Ex03.csproj.GenerateResource.Cache
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Release\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Release\CG1.Ex03.pdb
+C:\Users\mm\Desktop\CG1.Ex03\obj\x86\Release\CG1.Ex03.exe
+C:\Users\mm\Desktop\CG1.Ex03\obj\x86\Release\CG1.Ex03.pdb
+C:\Users\mm\Desktop\CG1.Ex03\bin\Release\CG1.Ex03.exe
+C:\Users\mm\Desktop\CG1.Ex03\bin\Release\CG1.Ex03.pdb
+C:\Users\mm\Desktop\CG1.Ex03\obj\x86\Release\CG1.Ex03.Form1.resources
+C:\Users\mm\Desktop\CG1.Ex03\obj\x86\Release\CG1.Ex03.Properties.Resources.resources
+C:\Users\mm\Desktop\CG1.Ex03\obj\x86\Release\CG1.Ex03.csproj.GenerateResource.Cache
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\CG1.Ex03.exe
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\CG1.Ex03.pdb
+y:\shared\skola\pg1\CG1.Ex03\bin\Release\CG1.Ex03.exe
+y:\shared\skola\pg1\CG1.Ex03\bin\Release\CG1.Ex03.pdb
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\ResolveAssemblyReference.cache
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\CG1.Ex03.Form1.resources
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\CG1.Ex03.Properties.Resources.resources
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\GenerateResource.read.1.tlog
+y:\shared\skola\pg1\CG1.Ex03\obj\x86\Release\GenerateResource.write.1.tlog

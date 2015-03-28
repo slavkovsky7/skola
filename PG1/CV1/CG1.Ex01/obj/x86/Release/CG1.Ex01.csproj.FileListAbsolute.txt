@@ -1,0 +1,9 @@
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\bin\Release\CG1.Ex01.exe
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\bin\Release\CG1.Ex01.pdb
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\obj\x86\Release\CG1.Ex01.Form1.resources
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\obj\x86\Release\CG1.Ex01.Properties.Resources.resources
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\obj\x86\Release\CG1.Ex01.csproj.GenerateResource.Cache
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\obj\x86\Release\CG1.Ex01.exe
+G:\WORKSPACE\skola-mgr\PG1\CG1.Ex01\obj\x86\Release\CG1.Ex01.pdb
+G:\WORKSPACE\skola-mgr\PG1\CV1\CG1.Ex01\obj\x86\Release\CG1.Ex01.exe
+G:\WORKSPACE\skola-mgr\PG1\CV1\CG1.Ex01\obj\x86\Release\CG1.Ex01.pdb

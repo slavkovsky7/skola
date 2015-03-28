@@ -1,0 +1,8 @@
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\bin\Debug\CG1.Ex08.exe
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\bin\Debug\CG1.Ex08.pdb
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.csprojResolveAssemblyReference.cache
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.Form1.resources
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.Properties.Resources.resources
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.csproj.GenerateResource.Cache
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.exe
+G:\WORKSPACE\skola-mgr\PG1\Ex08.Template\CG1.Ex08\obj\x86\Debug\CG1.Ex08.pdb

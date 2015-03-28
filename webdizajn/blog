@@ -1,0 +1,121 @@
+<h1>Ako nastaviť TCP keepalive pri použití JDBC v Jave.</h1>
+
+V článku sa budem venovať problému, ktorý som riešil v práci zhruba dva týždne.
+Investoval som do toho pomerne veľa času a výsledok by mohol niekto nazvať možno znásilnovaním javy a ľudia, ktorí berú programovanie resp. niektoré štýly programovania ako náboženstvo by možno pri pohľade na výsledok neboli úplne spirituálne naplnení.
+
+<h3>Čo je JDBC?</h3>
+JDBC(Java database connectivity technology ) je štandardizované API pre Javu, ktoré sa používa na prácu s databázou. Jeho predchodcom resp. niečím podobným je ODBC, ktoré už nie je moderné a pomaly sa prestáva používať. Napríklad pre Oracle databázu si programátor stiahne implementáciu Oracle klienta ako *.jar, ktoré ma vnútorne implementované operácie ako db.open(), db.execute(), db.query(). Podobne majú tie isté metódy implementované aj JDBC knižnice iných databáz ako napríklad MySQL, MSSQL, PostgreSQL atď.
+
+<h3>Čo je TCP keepalive?</h3>
+Jedná sa o spôsob detekcie spadnutého sieťového spojenia. Je to akýsi ping TCP socketu, ktorý nám pomáha detekovať, či je pripojenie naozaj živé, a či má zmysel ďalej pracovať so socketom.
+Používa sa to napríklad na korektné "vytimeoutovanie" nejakej operácia. Rozdiel pri použití timeoutu pomocou keepalive a npr. pomocou SO_TIMEOUT je nasledovný.
+
+<ul>
+<li><h3>SO_TIMEOUT, RCV_TIMEO, SND_TIMEO</h3>
+Jedná sa o štandardné nastavenia socketu pomocou funkcie setsocketopt() v c/c++.
+Ak teda nastavíme SO_TIMEOUT povedzme na 10 sekúnd, tak akákoľvek operácia, ktorá neskončila do tohto času bude násilne prerušená. Môže sa nám teda stať, že ak čítanie veľkého množstva dát z databázy trvá viac ako 10 seḱúnd dostaneme timeout, aj keď je spojenie v skutočnosti v poriadku.
+</li>
+<li><h3>Keepalive timeout</h3>
+Keepalive nastavuje štandardne pomocou TCP_KEEPCNT,TCP_KEEPIDLE,TCP_KEEPINTVL. Ak niekto chce zistiť podrobnosti o týchto nastaveniach odporúčam pozrieť si tento  <a href="http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/">článok</a>
+
+<p>Potom môžeme vypočítať výsledný timeout ako :</p>
+<code>timeout = TCP_KEEPIDLE + (TCP_KEEPCNT + 1)*TCP_KEEPINTVL</code>
+</li>
+</ul>
+
+<p>Na Windowse a Linuxe sa trochu to nastavenie líši, ale je to veľmi podobné a princíp ostáva ten istý.</p>
+
+
+<h3>Čo je teda problém s JDBC?</h3>
+JDBC pre mňa z nepochopiteľných dôvodov vôbec keepalive nerieši. Pre PosgreSQL je obyčajný SQL_TIMEO timeout nastaviteľný pomocou connection stringu. Naopak pre MySQL alebo Oracle sa to vôbec nedá nastaviť. Môže nastať situácia, že pri vykonávaní databázovej operácie spadne sieťové spojenie a program ostane visieť a teda aj celý program.
+
+<h3>Riešenie</h3>
+Kedže JDBC nám nedáva možnosť priamo pristupovať k socketu a zároveň nám implementácia socketu nedovoľuje nastaviť keepalive, musíme postupovať v nasledujúcich krokoch.
+
+<h3>Nájdenie socketu</h3>
+<p>Pomocou Java reflection musíme pre jednotlivé datábazy lokalizovať a vytiahnuť file descriptor socketu. File descriptor je v podstate unikátne číslo ukazujúce na socket, ktorý práve používame.
+</p>
+<p>
+Nasledujúca trieda resp. funkcia getPrivateField slúži na získanie privátnej premennej z objektu. Kedže JDBC musí používať triedu Socket, stačí nám s debuggerom zistiť vnútornú štruktúru Connection triedy a nejakým spôsobom "vyhrabať" to čo potrebujeme. 
+</p>
+<code>public class ReflectionUtils {	
+	public static Field findAnyField(Object obj , String fieldName) throws SecurityException, NoSuchFieldException{
+	    Class clazz = obj.getClass();
+	    do {
+	        try {
+	            Field f = clazz.getDeclaredField(fieldName);
+	            return f;
+	        } catch (NoSuchFieldException e) {
+	            clazz = clazz.getSuperclass();
+	        }
+	    } while (clazz != null );
+	    throw new NoSuchFieldException(obj.getClass() + " doesn't containt field with name " + fieldName );
+	}
+
+    public static Object getPrivateField( String fieldPath, Object parentObject ) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+	    String[] fieldNames = fieldPath.split("\\.");
+	    Object obj = parentObject;
+	    for ( int i = 0; i &lt; fieldNames.length; i++) {
+	        Field f = findAnyField( obj, fieldNames[i] );
+	        f.setAccessible(true);
+	        obj = f.get(obj);
+	    };
+	    return obj;
+    }
+}</code>
+
+<p>Priklad toho ako dostať z Connection triedy objekt triedy Socket pre Oracle.  
+Pre iné databázy bude string v getPrivateField() vyzerať inak.</p> 
+<code>//Connecion c = JDBC Connection objekt
+Object inner = ReflectionUtils.getPrivateField("inner", c);
+Socket socḱet = (Socket) ReflectionUtils.getPrivateField("net.sAtts.nt.socket", inner );</code>
+
+<p>Ak máme socket vieme opäť pomocou našej metódy zistiť file descriptor.</p> 
+<code>int fd = (Integer)ReflectionUtils.getPrivateField("impl.fd.fd", s );</code>
+
+<h3>Použitie natívnych socket funckií</h3>
+<p>Pomocou JNA(Java Native Access) si implementujeme štandarné natívne funkcie pracujúce so socketom. Potrebujeme getsockopt, setsockopt pre Windows aj WSAIoctl.</p>
+
+<p>Trieda, ktorá obaľuje pomocou JNA funkcie na prácu so socketmi. Pre Windows to bude samozrejme iná knižnica teda aj iná trieda a konkrétne treba použiť knižnicu Ws2_32.dll. Hodnoty SOL_SOCKET alebo SO_RCVTIMEO si treba pozrieť v c/c++ hlavičkách priamo v Linuxe alebo Windowse.</p>
+
+<code>public interface LinuxSocketsLib extends Library {
+    public final LinuxSocketsLib INSTANCE = (LinuxSocketsLib) Native.loadLibrary(  "c" , LinuxSocketsLib.class);
+
+    public static final int  SOL_SOCKET = 1;
+    public static final int  SO_RCVTIMEO =	20;
+    public static final int  SO_SNDTIMEO = 21;
+    public static final int  SOL_TCP = 6;
+    public static final int  TCP_KEEPIDLE	=	 4 ; /* Start keeplives after this period */
+    public static final int  TCP_KEEPINTVL	=	 5 ; /* Interval between keepalives */
+    public static final int  TCP_KEEPCNT	=	 6 ; /* Number of keepalives before death */
+    public static final int  SO_KEEPALIVE	=	9;
+        
+    public int setsockopt(int socket, int level, int option_name, Pointer option_value, int option_len) throws LastErrorException;
+    public int setsockopt(int socket, int level, int option_name, timeval option_value, int option_len) throws LastErrorException;
+    public int getsockopt(int sockfd, int level, int optname, Pointer optval,IntByReference optlen) ;
+    public int getsockopt(int sockfd, int level, int optname, timeval optval,IntByReference optlen) ;
+    public String strerror(int errnum);
+    
+    public class timeval extends Structure {
+    	public long tv_sec;
+    	public long tv_usec;
+        public timeval() {}
+        public timeval(Pointer p) {super(p);read(); }
+
+		@Override
+		protected List getFieldOrder() {
+		     return Arrays.asList(new String[] { "tv_sec", "tv_usec" });
+		}
+    }
+}</code>
+
+<p>Výsledný kód kde nastavujeme už keepalive a jeho timeout pre socket potom vyzerá nasledovne</p>
+
+<code>LinuxSocketsLib.INSTANCE.setsockopt(fd, LinuxSocketsLib.SOL_SOCKET, LinuxSocketsLib.SO_KEEPALIVE , new IntByReference(soKeepAlive).getPointer(),  4 );	
+LinuxSocketsLib.INSTANCE.setsockopt(fd, LinuxSocketsLib.SOL_TCP, LinuxSocketsLib.TCP_KEEPCNT  , new IntByReference(tcpKeepCnt).getPointer(),   4 );
+LinuxSocketsLib.INSTANCE.setsockopt(fd, LinuxSocketsLib.SOL_TCP, LinuxSocketsLib.TCP_KEEPIDLE , new IntByReference(tcpKeepIdle).getPointer(),  4 );
+LinuxSocketsLib.INSTANCE.setsockopt(fd, LinuxSocketsLib.SOL_TCP, LinuxSocketsLib.TCP_KEEPINTVL, new IntByReference(tcpKeepIntVl).getPointer(), 4 );	</code>
+
+<h3>Zhrnutie</h3>
+Dosť násilným hackom, kde sme pristúpili k socketu a použitím natívnych systémových funkcií sme dosiahli, že nám socket vytimeoutuje, až keď je spojenie naozaj prerušené.
+Tiež sme sa zbavili prípadného deadlocku programu pri výpadku databázy. Podobný postup bude určite aplikovateľný aj na iné technológie ako JDBC.

@@ -1,0 +1,9 @@
+[{
+  "directory": "/home/martin/workspace/skola/vkti",
+  "command": "/usr/bin/g++-4.8 -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/main.cpp.o -MF./Debug/main.cpp.o.d -MM main.cpp",
+  "file": "/home/martin/workspace/skola/vkti/main.cpp"
+ }, {
+  "directory": "/home/martin/workspace/skola/vkti",
+  "command": "/usr/bin/g++-4.8 -c /home/martin/workspace/skola/vkti/main.cpp -g -O0 -Wall -o ./Debug/main.cpp.o -I. -I.",
+  "file": "/home/martin/workspace/skola/vkti/main.cpp"
+ }]

@@ -1,0 +1,383 @@
+#include <stdio.h>
+#include <vector>
+#include <set>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <stdlib.h>
+#include <map>
+//#include <test.h>
+
+using namespace std;
+
+const int SQUARE_SIZE = 2;
+class Square{
+public:
+    int x, y ;
+public: 
+    Square(int x, int y)
+        :x(x), y(y)
+    {}
+    
+    bool overlap( const Square& o ){
+       int vX =  this->x - o.x;
+       int vY =  this->y - o.y;
+       return 
+        (vX ==  0 && vY ==  0) ||
+        
+        (vX ==  1 && vY ==  1) ||
+        (vX == -1 && vY ==  1) ||
+        (vX == -1 && vY == -1) ||
+        (vX ==  1 && vY == -1) || 
+        
+        (vX ==  1 && vY == 0) || 
+        (vX == -1 && vY == 0) || 
+        (vX ==  0 && vY == 1) || 
+        (vX ==  0 && vY ==-1)  ;
+    }
+    
+
+};
+
+bool operator==(const Square& lhs, const  Square& rhs){
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+
+bool operator<(const Square& lhs, const  Square& rhs){
+   return !( lhs == rhs);
+}
+ 
+#define NOT_SET     -1
+//#define C1          0
+//#define C2          1
+//#define C3          2
+//#define C4          3
+#define COLOR_COUNT  4
+
+
+class Node{
+public:
+    int index;
+    vector<Node*> neighbours;
+    Square square;
+    int weight;
+    int colorCode;
+public:
+    Node(int index, const Square& square ):index(index),square(square), colorCode(NOT_SET) {
+    }
+    
+    string toString(){
+        stringstream strStream;
+        strStream << "["<<index<<"->";
+        for (unsigned int i = 0; i < neighbours.size(); i++){
+            if (i > 0) strStream << ", ";
+            strStream << neighbours[i]->index;
+        }  
+        strStream << ", data = {"<<square.x<<", "<<square.y<<"} ]";
+        
+        return strStream.str();
+    }
+    
+    int degree(){
+        return this->neighbours.size();
+    }
+    
+    int getFreeColor(){
+        set<int> usedColors;
+        for (unsigned int i = 0; i < neighbours.size(); i++){
+            usedColors.insert(neighbours[i]->colorCode);
+        }
+
+        for (int i = 0; i < COLOR_COUNT; i++){
+            if (usedColors.find(i) == usedColors.end()){
+                return i;
+            }
+        }
+        
+        cout << "Toto sa nemalo stat!!" << endl;
+    }
+};
+
+struct Edge{
+public:
+    Node* u;
+    Node* v;
+public:
+    Edge(Node* u, Node* v)
+        :u(u), v(v)
+    {}
+    
+    int isAdjacent(Edge* other ){
+        return  this->u == other->v || this->v == other->v || 
+                this->u == other->u || this->v == other->u ;
+    }
+    
+    bool containsNodes(int n1, int n2){
+        return  (u->index == n1 && v->index == n2) || 
+                (u->index == n2 && v->index == n1) ;
+    }
+    
+    
+    friend bool operator==(const Edge& lhs, const Edge& rhs);
+    friend class EdgeComparator;
+    
+    string toString(){
+        stringstream strStream;
+        strStream << "["<<u->index<<"->"<<v->index<<"]"; 
+        return strStream.str();
+    }
+};
+
+
+class Graph{
+private:
+    int n;
+    vector<Edge*> edges;
+    vector<Node*> nodes;
+    
+public: Graph(vector<Square>& squares){
+        set<Square> squareSet;
+        for (unsigned int i = 0 ; i < squares.size(); i++){
+            squareSet.insert(squares[i]);
+        }
+        
+        vector<Square> reducedSquares; reducedSquares.reserve(squareSet.size());
+        for ( set<Square>::const_iterator it = squareSet.begin(); it != squareSet.end(); it++){
+            reducedSquares.push_back(*it);
+        }
+        
+        nodes.reserve(reducedSquares.size());
+        for (unsigned int i = 0; i < reducedSquares.size(); i++){
+            nodes.push_back(new Node(i, reducedSquares[i]));
+        }
+        
+        for (unsigned int i = 0; i < nodes.size(); i++){
+           
+            for (unsigned int j = i + 1; j < nodes.size(); j++){
+                //cout << "------" << endl;
+                //cout << nodes[i]->toString() << endl;
+               // cout << nodes[j]->toString() << endl;
+                if (nodes[i]->square.overlap( nodes[j]->square) ){
+                    //cout << "adding edge" << endl;
+                    addEdge(nodes[i], nodes[j]);
+                }
+            }
+        }
+    }
+    
+    int getMaximumIndepenentSetCount(){
+        //Farbenie grafu
+        typedef multimap<int, multimap<int, Node*>* > OrdereNodesMap;
+        OrdereNodesMap ymap;
+        for (unsigned int i = 0 ; i < nodes.size(); i++){
+            Node * node = nodes[i];
+            OrdereNodesMap::iterator it = ymap.find( node->square.y );
+            multimap<int, Node*>* xMap = NULL ;
+            if (it == ymap.end()){
+                xMap = new multimap<int, Node*>(); 
+                ymap.insert( make_pair(node->square.y, xMap) );
+            }else{
+                xMap = it->second;
+            }
+            xMap->insert( make_pair(node->square.x, nodes[i]) );
+        }        
+        
+        int colorCounts[4] = {0,0,0,0};
+        
+        for ( OrdereNodesMap::iterator it = ymap.begin(); it != ymap.end(); it++){
+            multimap<int, Node*>* xMap = it->second;
+            for ( multimap<int, Node*>::iterator jt = xMap->begin(); jt != xMap->end(); jt++){
+                Node * node = jt->second;
+                node->colorCode = node->getFreeColor();
+                colorCounts[ node->colorCode ]++;
+            }
+        }
+        
+        int result = -1;
+        for (int i = 0; i < 4; i++){
+            if ( colorCounts[i] > result){
+                result = colorCounts[i];
+            }
+        }
+        return result;
+        //Spocitanie farieb
+    }
+    
+    Edge *  addEdge(Node * u ,Node * v ){
+        Edge * e = new Edge(u,v); 
+        edges.push_back( e );
+        u->neighbours.push_back( v );
+        v->neighbours.push_back( u );
+        return e;
+    }
+
+    int getEdge(int u, int v){
+        for (unsigned int i = 0; i < edges.size(); i++){
+            if (edges[i]->containsNodes(u,v)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    Node* findNode(int index){
+        for (unsigned int i = 0; i < nodes.size(); i++ ){
+            if (nodes[i]->index == index )
+                return nodes[i];
+        }
+        return NULL;
+    }
+
+    string toString(){
+        stringstream strStream;
+        strStream << "nodes: ";
+        for (unsigned int i = 0 ; i < nodes.size(); i++){
+            strStream << endl;
+            strStream <<"  "<< nodes[i]->toString();
+        }
+
+        /*strStream << "edges: [";
+        for (unsigned int i = 0 ; i < edges.size(); i++){
+            if (i > 0) strStream << ", ";
+            strStream << edges[i]->toString();
+        }
+        strStream << "]";*/
+        return strStream.str();
+    }
+};
+  
+
+/*void testSquares(){
+    Test::areEqual(true , Square(1,1).overlap(Square(1,1)) , "TestSquares1");
+    Test::areEqual(false, Square(3,3).overlap(Square(1,1)) , "TestSquares2");
+    
+    Test::areEqual(true, Square(2,2).overlap(Square(1,1)) , "TestSquares3");
+    Test::areEqual(true, Square(1,1).overlap(Square(2,2)) , "TestSquares4");
+    
+    Test::areEqual(true, Square(0,0).overlap(Square(1,1)) , "TestSquares5");
+    Test::areEqual(true, Square(2,0).overlap(Square(1,1)) , "TestSquares6");
+    Test::areEqual(true, Square(0,2).overlap(Square(1,1)) , "TestSquares7");
+    Test::areEqual(true, Square(2,2).overlap(Square(1,1)) , "TestSquares8");
+    
+    Test::areEqual(true, Square(1,1).overlap(Square(0,0)) , "TestSquares9");
+    Test::areEqual(true, Square(1,1).overlap(Square(2,0)) , "TestSquares10");
+    Test::areEqual(true, Square(1,1).overlap(Square(0,2)) , "TestSquares11");
+    Test::areEqual(true, Square(1,1).overlap(Square(2,2)) , "TestSquares12");
+    
+    Test::areEqual(false, Square(2,0).overlap(Square(0,2)) , "TestSquares12");
+    Test::areEqual(false, Square(0,2).overlap(Square(2,0)) , "TestSquares13");
+    
+    //Test::areEqual(true, Square(2,2) == Square(2,2)  , "TestSquares14");
+    //Test::areEqual(false, Square(1,2) == Square(2,2) , "TestSquares15");
+    
+    Test::areEqual(true, Square(1,0).overlap(Square(0,0)) , "TestSquares15");
+    //Test::areEqual(false, Square(0,2).overlap(Square(2,0)) , "TestSquares16");
+}
+
+void testUloha(){
+    vector<Square> sqList;
+    sqList.push_back(Square(0,0));
+    sqList.push_back(Square(1,1));
+    sqList.push_back(Square(2,2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 2 , "TestSquares1");
+    
+    sqList.clear();
+    sqList.push_back(Square(0, 1));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(1, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 2, "TestSquares2");
+
+    sqList.clear();
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(0, 1));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 2, "TestSquares3");
+
+    sqList.clear();
+    sqList.push_back(Square(0, 0));
+    sqList.push_back(Square(0, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 2, "TestSquares4");
+
+    sqList.clear();
+    sqList.push_back(Square(0, 0));
+    sqList.push_back(Square(0, 1));
+    sqList.push_back(Square(0, 2));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(1, 1));
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(2, 0));
+    sqList.push_back(Square(2, 1));
+    sqList.push_back(Square(2, 2));
+    sqList.push_back(Square(3, 0));
+    sqList.push_back(Square(3, 1));
+    sqList.push_back(Square(3, 2));
+    sqList.push_back(Square(4, 0));
+    sqList.push_back(Square(4, 1));
+    sqList.push_back(Square(4, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 6, "TestSquares5");
+   
+    sqList.clear();
+    sqList.push_back(Square(0, 0));
+    sqList.push_back(Square(0, 2));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(2, 1));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 3, "TestSquares6");
+   
+    sqList.clear();
+    sqList.push_back(Square(0, 2));
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(1, 0));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 2, "TestSquares7");
+   
+    sqList.clear();
+    sqList.push_back(Square(0, 1));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(2, 0));
+    sqList.push_back(Square(2, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 3, "TestSquares8");
+   
+    sqList.clear();
+    sqList.push_back(Square(0, 1));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(1, 2));
+    sqList.push_back(Square(2, 0));
+    sqList.push_back(Square(2, 2));
+    sqList.push_back(Square(3, 0));
+    sqList.push_back(Square(3, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 4, "TestSquares9");
+    
+    sqList.clear();
+    sqList.push_back(Square(2, 2));
+    sqList.push_back(Square(2, 2));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 1, "TestSquares10");
+    
+    sqList.clear();
+    sqList.push_back(Square(0, 0));
+    sqList.push_back(Square(1, 0));
+    sqList.push_back(Square(0, 1));
+    Test::areEqual( Graph(sqList).getMaximumIndepenentSetCount(), 1, "TestSquares11");
+}*/
+
+/************** MAIN **************/
+
+int main(int argc, char **argv)
+{   
+    int n = 0;
+    cin >> n;
+    vector<Square> squares;
+    //squares.res
+    for (int i = 0; i < n; i++){
+        int x, y;
+        cin >> x >> y;
+        squares.push_back(Square(x,y));
+    }
+    Graph g(squares);
+    
+    cout << g.getMaximumIndepenentSetCount() << endl;
+    //testSquares();
+    //testUloha();
+    return 0;
+}

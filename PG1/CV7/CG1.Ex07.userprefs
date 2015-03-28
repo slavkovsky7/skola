@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CG1.Ex07/Rasterization/Circle.cs">
+    <Files>
+      <File FileName="CG1.Ex07/Program.cs" Line="1" Column="1" />
+      <File FileName="CG1.Ex07/Form1.cs" Line="1" Column="1" />
+      <File FileName="CG1.Ex07/Rasterization/Line.cs" Line="1" Column="1" />
+      <File FileName="CG1.Ex07/Rasterization/Ellipse.cs" Line="1" Column="1" />
+      <File FileName="CG1.Ex07/Rasterization/Circle.cs" Line="36" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

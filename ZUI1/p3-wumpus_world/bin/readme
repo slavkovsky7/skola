@@ -1,0 +1,43 @@
+1.)Na vyhladavanie som pouzil prehladavanie do sirky s heuristikou. V kazdom kroku, ked nemam uz vypocitanu cestu, teda nemam smer niekam, 
+tak vypocitam cestu k najblizsiemu policku, ktore je bezpecne. To zistujem pomocou k.ask(x,y, "safe", true)
+- policko sa oznaci ze je safe ak idem na take x,y ktore nie je ani breeze ani stench, potom oznacim vsetky policka okolo, ze su safe
+x+1,y
+x-1,y
+x,y+1
+x,y+1
+
+- v programe mam jednu hornovu klauzulu !pit[x,y] && !wumpus[x,y] => safe[x,y]
+- ak pridem na [x,y], ktore je breeze a nie je stench oznacim si vsetkych susedov ako !wumpus
+- podobne ak pridem na [x,y], ktore je stench a nie je breeze oznacim si susedov ako !pit
+- takto potom dostanem situaciu, ze sa niektore policka vyriesia ako safe pomocou kb.ask
+
+- detekciu jam teda uplne stacia podmienky, ktore som zatial opisal. Tie su staticke a nedaju sa menit, takze nema zmysel urcovat,
+kde presne su
+
+Detekcia wumpus
+---------------
+- Wumpus na druhu stranu moze byt zabity, a preto je dobre vediet, kde presne je
+- kazde policko, na ktore stupim je oznacene ako not wumpus, teda aj stena, do ktorej narazim 
+- tu nakreslim situacie, ktore sa daju vydedukovat z existujucich faktov a vieme zistit kde je wumpus
+- W wumpus, !W not wumpus, S je stench
+W S	W! S	S  W	W S	 S	S W S
+S W!	S  W	W! S	S W!	 W
+				 S
+
+A potom pripady kedy nam brania steny
+/*     !W           W
+*  !W  S !W  OR !W S !W
+*      W    	   !W*/	
+
+/*    !W          !W
+*   W  S !W  OR !W S W
+*     !W    	  !W*/
+
+- ak viem poziciu wumpusa , cesta je vypocitana k najblizsiemu stench policku
+- agent sa na wumpusa otoci a surovo ho zabije
+- potom sa vymazu vsetky stench zaznamy s kb
+- pokracuje sa normnalne
+- agnet sa vracia spat ak nevie vypocitat cestu a wumpus je mrtvy alebo ho nevie lokalizovat
+
+
+

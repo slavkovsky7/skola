@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>NNPerceptron</name>
+  <groupId>com.mslavkovsky.nn</groupId>
+  <artifactId>perceptron</artifactId>
+  <version>1.0.0</version>
+    
+  <dependencies>
+    <dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-math3</artifactId>
+	    <version>3.2</version>
+    </dependency>
+  </dependencies>
+    
+    
+  <repositories>
+        <repository>
+            <id>java.net-Public</id>
+            <name>Maven Java Net Snapshots and Releases</name>
+            <url>https://maven.java.net/content/groups/public/</url>
+        </repository>
+	<repository>
+            <id>apache.releases</id>
+            <name>Apache commons releases</name>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
+        </repository>
+  </repositories>
+</project>

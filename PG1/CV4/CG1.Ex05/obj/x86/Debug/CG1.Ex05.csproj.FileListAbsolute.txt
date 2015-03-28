@@ -1,0 +1,34 @@
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\CG1.Ex05.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\CG1.Ex05.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Form1.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Properties.Resources.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\obj\x86\Debug\CG1.Ex05.csproj.GenerateResource.Cache
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\obj\x86\Debug\CG1.Ex05.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\obj\x86\Debug\CG1.Ex05.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\Meshes\example.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\Meshes\hexagon.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\Meshes\hexagon2.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Sample\CG1.Ex05\CG1.Ex05\bin\Debug\Meshes\square.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\obj\x86\Debug\CG1.Ex05.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\obj\x86\Debug\CG1.Ex05.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\Meshes\example.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\Meshes\hexagon.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\Meshes\hexagon2.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\Meshes\square.off
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\CG1.Ex05.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\bin\Debug\CG1.Ex05.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Form1.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Properties.Resources.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex05\Template\CG1.Ex05\obj\x86\Debug\CG1.Ex05.csproj.GenerateResource.Cache
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.exe
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.pdb
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\Meshes\example.off
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\Meshes\hexagon.off
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\Meshes\hexagon2.off
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\Meshes\square.off
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\CG1.Ex05.exe
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\bin\Debug\CG1.Ex05.pdb
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Form1.resources
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.Properties.Resources.resources
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.csproj.GenerateResource.Cache
+g:\WORKSPACE\skola-mgr\PG1\CV4\CG1.Ex05\obj\x86\Debug\CG1.Ex05.csprojResolveAssemblyReference.cache

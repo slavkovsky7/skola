@@ -1,0 +1,35 @@
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\bin\Debug\CG1.Ex02.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\bin\Debug\CG1.Ex02.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Form1.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Properties.Resources.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Ex02\CG1.Ex02\CG1.Ex02\obj\x86\Debug\CG1.Ex02.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\bin\Debug\CG1.Ex02.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\bin\Debug\CG1.Ex02.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Form1.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Properties.Resources.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\bin\Debug\CG1.Ex02.exe
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\bin\Debug\CG1.Ex02.pdb
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Form1.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Properties.Resources.resources
+D:\School\Phd Degree\Teaching\2013\CG1\Ex02\Template\CG1.Ex02\obj\x86\Debug\CG1.Ex02.csproj.GenerateResource.Cache
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.exe
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.pdb
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\bin\Debug\CG1.Ex02.exe
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\bin\Debug\CG1.Ex02.pdb
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Form1.resources
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.Properties.Resources.resources
+G:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.csproj.GenerateResource.Cache
+g:\WORKSPACE\skola-mgr\PG1\CV2\CG1.Ex02\obj\x86\Debug\CG1.Ex02.csprojResolveAssemblyReference.cache

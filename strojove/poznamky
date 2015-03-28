@@ -1,0 +1,26 @@
+http://tcs.rwth-aachen.de/lehre/PRICS/WS2006/kohlschein.pdf - Hidden Markov models skripta
+http://cs229.stanford.edu/section/cs229-hmm.pdf 
+http://cs229.stanford.edu/proj2011/Ho-MoviesGenresClassificationBySynopsis.pdf - projekt
+
+http://nlp.stanford.edu/IR-book/html/htmledition/tf-idf-weighting-1.html
+
+
+Poznamky 
+
+Bag of Words
+TfIdf
+
+
+-------------------------------------------
+stop words = http://www.lextek.com/manuals/onix/stopwords1.html
+
+
+-------------------------------------------
+
+Plan:
+
+1. Ziskat data z IMDB
+2. Okresat clanky o caste slova ako this, the, a atd. (stop words)
+3. Pouzit nejaku "stemming" kniznicu na upravenie slov do povodneho tvaru ( base )
+4. Vyrobit zakladnu BoW reprezentaciu -> D = { mnozina clankov }, dictionary = slovnik podla toho.
+5. Nejako aplikovat 

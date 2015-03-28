@@ -1,0 +1,102 @@
+################ 2.A) ################
+
+function xtrain,ytrain,xtest,ytest = random_data (x, y, nrand)
+	nrows = size(x,1);
+	assert(nrand<=nrows, 'You cannot choose more rows than exist in the matrix');
+	
+	all = randperm(nrows);
+
+	train_rows = randperm(nrows, nrand);
+	xtrain = x(train_rows,:); 
+	ytrain = y(train_rows,:);
+
+	test_rows = setdiff(all,train_rows);
+	xtest = x(test_rows,:); 
+	ytest = y(test_rows,:);
+
+endfunction
+
+function [r1,r2]  = load_data()
+	r1 = load("/home/martin/Strojove/uloha.data");
+	s = size(r1,2);
+	# posledny stlpec matice presunieme do y , nahradime ho jednotkami
+	# mame to co chceme
+	r2 = r1(:,s);
+	r1(:,s)=1;
+endfunction
+
+################ 2.B) ################
+
+% http://users.encs.concordia.ca/~krzyzak/R%20Code-Communications%20in%20Statistics%20and%20Simulation%202014/Zubeh%F6r/combinator/combinator.m
+% funckiu som si pozical z internetu
+function CR = combs_rep(N,K)
+  % Subfunction multichoose:  combinations with replacement.
+  % cr = @(N,K) prod((N):(N+K-1))/(prod(1:K)); Number of rows.
+
+  M = double(N);  % Single will give us trouble on indexing.
+  WV = ones(1,K,class(N));  % This is the working vector.
+  mch = prod((M:(M+K-1)) ./ (1:K));  % Pre-allocation.
+  CR = ones(round(mch),K,class(N));
+
+  for ii = 2:mch
+      if WV(K) == N
+	  cnt = K-1;  % Work backwards in WV.
+	  
+	  while WV(cnt) == N
+	      cnt = cnt-1;  % Work backwards in WV.
+	  end
+
+	  WV(cnt:K) = WV(cnt) + 1;  % Fill forward.
+      else
+	  WV(K) = WV(K)+1;   % Keep working in this group.
+      end
+
+      CR(ii,:) = WV;
+  end
+endfunction
+
+% tato je moja
+function ret = get_base_attr (attr)
+  % velkost vektora atributov
+  ret = [1];
+  n = size(attr,2);
+  for i = 1:n
+    %ideme postupne ziskavat kombinacie s opakovanim n / i
+    combs = combs_rep(n,i);
+    for i = 1:size(combs,1)
+      expr = 1;
+      % exprString = "";
+      for j = 1:size(combs,2)
+	el = combs(i,j);
+	expr = expr*el;
+	% exprString = sprintf("%s.X%d",exprString, el );
+      end
+      ret(end + 1) = expr;
+      % printf("%s\n", exprString );
+    end
+  end
+endfunction
+
+
+
+
+
+########################################
+
+# nacitanie suboru
+
+[x,y]=load_data();
+#uloha A.)
+[xtrain,ytrain,xtest,ytest] = random_data(x,y,1025);
+###########Main############
+
+
+##########toto bude funkcia############
+#graficky test nacitania
+#plot3(x(:,4),y,"x")
+# predpovedanie hodnot
+#theta=x'*x\(x'*y)
+#yy=x*theta;
+#plot3(x(:,4),x(:,13),y,"x",x(:,4),x(:,13),yy,"o")
+
+

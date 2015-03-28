@@ -1,0 +1,9 @@
+C:\workspace\skola\pg1\CV5\CG1.Ex04\bin\Debug\CG1.Ex04.exe
+C:\workspace\skola\pg1\CV5\CG1.Ex04\bin\Debug\CG1.Ex04.pdb
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\CG1.Ex04.Form1.resources
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\CG1.Ex04.Properties.Resources.resources
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\CG1.Ex04.exe
+C:\workspace\skola\pg1\CV5\CG1.Ex04\obj\x86\Debug\CG1.Ex04.pdb

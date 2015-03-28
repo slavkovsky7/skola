@@ -1,0 +1,6 @@
+%load data, mozne - and, or, hard
+load hard
+
+[n_data,n_input] = size(data);
+
+data

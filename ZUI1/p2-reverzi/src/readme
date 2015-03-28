@@ -1,0 +1,18 @@
+Alogirtmy
+
+Je pouzitity alphaBeta algoritmus na prehladavanie. AlphaRoot metoda je ako keby prva iteracia algoritmu.
+Ziadne dalsie specialne vysvetlenia algoritmu som nedorabal.
+
+Riesenie casu.
+
+Na riesenie casu je pouzity Iterative Deepining. 
+
+http://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search
+Postupne prechadzame 1,2,3,4 .... k level.
+V pripade ze sme v i-tom leveli zistili, ze je timeout vynor sa co najskor z rekurzie. Do vysledku sa potom bude brat
+vysledok z posledneho uspesne dobehnuteho alphaBetaRootu.
+
+Heuristika:
+Pouziva sa pozicionovanie . Rohy maju najvacsiu prioritu / odmenu, stred najmensiu.
+
+http://radagast.se/othello/Help/strategy.html

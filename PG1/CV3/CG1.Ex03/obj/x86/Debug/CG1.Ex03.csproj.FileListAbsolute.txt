@@ -1,0 +1,43 @@
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Form1.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Properties.Resources.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\CG1.Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\bin\Debug\CG1.Ex03.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\bin\Debug\CG1.Ex03.pdb
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Form1.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Properties.Resources.resources
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\CG1.Ex03.exe
+C:\Users\Public\Documents\School\Phd Degree\Teaching\2012\CG1\Ex03\Template\CG1.Ex03\obj\x86\Debug\CG1.Ex03.pdb
+D:\Document\Desktop\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.exe
+D:\Document\Desktop\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.pdb
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Form1.resources
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Properties.Resources.resources
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.exe
+D:\Document\Desktop\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Form1.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Properties.Resources.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\PG1\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.exe
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\bin\Debug\CG1.Ex03.pdb
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Form1.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.Properties.Resources.resources
+C:\Users\mm\Desktop\SKOLA\rok 01\zima\PG1\Ex03\CG1.Ex03\obj\x86\Debug\CG1.Ex03.csproj.GenerateResource.Cache

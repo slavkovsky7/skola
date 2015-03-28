@@ -1,0 +1,26 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CG1.Ex08/Form1.cs">
+    <Files>
+      <File FileName="CG1.Ex08/Geometry/Edge.cs" Line="17" Column="21" />
+      <File FileName="CG1.Ex08/Geometry/Polygon.cs" Line="19" Column="15" />
+      <File FileName="CG1.Ex08/Form1.cs" Line="43" Column="23" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="CG1.Ex08" expanded="True">
+            <Node name="Geometry" expanded="True" />
+            <Node name="Mathematics" expanded="True" />
+            <Node name="Properties" expanded="True" selected="True" />
+            <Node name="Rasterization" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

@@ -1,0 +1,10 @@
+10 small.txt 1 200 2
+10 MapaLOL.txt 1 525 794
+10 unicursal50.txt 1 900 1000
+10 perfect70.txt 1 9000 7581
+10 cavern80.txt 3 9000 10293
+10 lorem.txt 5 1500 3148
+10 brajd123.txt 5 2000 16848
+10 tilt.txt 5 1000 6621
+10 braidPassages160.txt 5 5500 25678
+10 diagonal200.txt 7 24000 57736

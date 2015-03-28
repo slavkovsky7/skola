@@ -1,0 +1,252 @@
+--------------- action---------------
+Accuracy  = 77.70%
+Precision = 78.96%
+Recall 	  = 76.95%
+F-mesaure = 77.94%
+Genres pre movie  = 3.2272
+Average plot size = 55.0428
+Most common words = find(910),kill(739),life(695),man(637),world(614),year(537),live(500),love(499),time(498),fight(473)
+Other genres      = drama(906),adventure(620),thriller(548),short(506),comedy(445),crime(442),sci-fi(363),romance(278),fantasy(225),horror(185)
+--------------- adult---------------
+Accuracy  = 85.25%
+Precision = 88.32%
+Recall 	  = 82.89%
+F-mesaure = 85.52%
+Genres pre movie  = 1.7460585585585586
+Average plot size = 46.16554054054054
+Most common words = sex(727),sexual(477),girl(443),find(421),young(384),film(369),make(368),woman(345),love(325),man(304)
+Other genres      = comedy(304),drama(197),short(109),animation(108),romance(92),fantasy(83),adventure(66),documentary(63),sci-fi(62),horror(56)
+--------------- adventure---------------
+Accuracy  = 73.20%
+Precision = 76.23%
+Recall 	  = 69.40%
+F-mesaure = 72.65%
+Genres pre movie  = 3.3868
+Average plot size = 54.2158
+Most common words = find(939),world(748),year(572),man(557),life(550),time(530),friend(522),live(498),film(492),young(486)
+Other genres      = action(900),drama(604),short(531),comedy(519),fantasy(439),family(373),documentary(325),sci-fi(323),animation(300),romance(300)
+--------------- animation---------------
+Accuracy  = 80.50%
+Precision = 83.23%
+Recall 	  = 77.17%
+F-mesaure = 80.08%
+Genres pre movie  = 3.466
+Average plot size = 48.3872
+Most common words = anim(718),world(679),find(598),life(506),time(483),film(432),friend(430),stori(426),make(412),live(407)
+Other genres      = short(1606),comedy(977),family(891),fantasy(435),adventure(400),drama(299),action(270),sci-fi(265),romance(151),music(108)
+--------------- biography---------------
+Accuracy  = 76.70%
+Precision = 74.51%
+Recall 	  = 78.38%
+F-mesaure = 76.39%
+Genres pre movie  = 3.3308
+Average plot size = 51.3544
+Most common words = film(1343),life(1336),stori(1107),year(900),world(747),live(733),documentari(643),famili(598),time(586),work(580)
+Other genres      = documentary(1714),short(914),drama(826),history(575),family(315),music(256),comedy(152),news(150),sport(136),war(135)
+--------------- comedy---------------
+Accuracy  = 71.40%
+Precision = 74.24%
+Recall 	  = 67.25%
+F-mesaure = 70.58%
+Genres pre movie  = 2.4872
+Average plot size = 50.0794
+Most common words = find(766),life(723),love(700),man(609),friend(599),make(589),live(543),time(489),film(435),young(434)
+Other genres      = short(1012),drama(589),romance(396),family(234),animation(201),action(158),horror(140),fantasy(130),crime(128),sci-fi(96)
+--------------- crime---------------
+Accuracy  = 82.00%
+Precision = 83.51%
+Recall 	  = 79.84%
+F-mesaure = 81.63%
+Genres pre movie  = 3.22
+Average plot size = 54.5054
+Most common words = find(1009),murder(946),polic(850),kill(822),man(771),life(698),friend(620),year(560),live(545),crime(541)
+Other genres      = drama(1462),thriller(854),action(677),comedy(476),short(454),mystery(452),romance(254),adventure(173),horror(132),documentary(104)
+--------------- documentary---------------
+Accuracy  = 84.70%
+Precision = 83.40%
+Recall 	  = 85.95%
+F-mesaure = 84.65%
+Genres pre movie  = 2.162
+Average plot size = 50.712
+Most common words = film(1429),year(888),documentari(876),stori(840),world(785),life(780),live(750),peopl(628),famili(470),work(464)
+Other genres      = short(856),biography(383),history(312),drama(235),music(197),news(179),family(156),sport(96),comedy(94),adventure(89)
+--------------- drama---------------
+Accuracy  = 68.50%
+Precision = 69.96%
+Recall 	  = 65.94%
+F-mesaure = 67.89%
+Genres pre movie  = 2.4588
+Average plot size = 50.8788
+Most common words = life(1080),love(787),find(769),live(737),year(701),young(669),man(653),stori(652),famili(584),film(543)
+Other genres      = short(865),romance(390),comedy(377),thriller(266),crime(233),action(217),family(157),documentary(146),mystery(119),war(101)
+--------------- family---------------
+Accuracy  = 71.00%
+Precision = 71.61%
+Recall 	  = 68.42%
+F-mesaure = 69.98%
+Genres pre movie  = 3.3616
+Average plot size = 52.432
+Most common words = life(872),famili(855),find(774),live(771),year(742),stori(602),father(554),make(552),film(544),love(537)
+Other genres      = short(1187),comedy(849),drama(804),animation(655),documentary(482),adventure(359),fantasy(267),romance(188),biography(188),action(125)
+--------------- fantasy---------------
+Accuracy  = 77.30%
+Precision = 76.84%
+Recall 	  = 76.69%
+F-mesaure = 76.77%
+Genres pre movie  = 3.5476
+Average plot size = 51.6804
+Most common words = world(928),find(913),life(807),live(620),man(588),time(585),year(550),love(527),stori(526),film(519)
+Other genres      = short(1191),drama(774),comedy(649),adventure(561),animation(505),action(421),family(401),sci-fi(364),horror(309),romance(302)
+--------------- film-noir---------------
+Accuracy  = 85.19%
+Precision = 82.91%
+Recall 	  = 88.99%
+F-mesaure = 85.84%
+Genres pre movie  = 3.615530303030303
+Average plot size = 65.88257575757575
+Most common words = murder(406),find(330),kill(278),polic(263),man(256),wife(225),love(182),meet(172),friend(159),monei(151)
+Other genres      = drama(453),crime(404),thriller(261),mystery(129),romance(72),action(15),adventure(10),music(8),comedy(5),sport(5)
+--------------- game-show---------------
+Accuracy  = 92.86%
+Precision = 99.12%
+Recall 	  = 86.26%
+F-mesaure = 92.24%
+Genres pre movie  = 1.7366818873668188
+Average plot size = 59.3310502283105
+Most common words = contest(1303),answer(955),show(882),question(819),game(813),team(630),win(569),round(536),prize(492),point(387)
+Other genres      = family(151),reality-tv(96),comedy(83),music(42),adventure(19),sport(19),action(14),romance(12),short(12),talk-show(8)
+--------------- history---------------
+Accuracy  = 76.80%
+Precision = 77.34%
+Recall 	  = 75.15%
+F-mesaure = 76.23%
+Genres pre movie  = 3.3684
+Average plot size = 53.1444
+Most common words = film(1166),stori(1081),year(804),war(737),world(705),life(675),live(585),histori(544),documentari(537),time(533)
+Other genres      = documentary(1432),drama(870),short(815),biography(613),war(414),news(255),adventure(207),family(193),romance(156),music(156)
+--------------- horror---------------
+Accuracy  = 84.20%
+Precision = 88.15%
+Recall 	  = 79.88%
+F-mesaure = 83.81%
+Genres pre movie  = 2.62
+Average plot size = 51.2756
+Most common words = find(956),friend(593),kill(587),year(570),young(559),man(550),hous(548),life(541),live(527),film(517)
+Other genres      = thriller(809),short(723),drama(473),comedy(434),mystery(340),sci-fi(330),fantasy(234),action(228),crime(114),adventure(85)
+--------------- music---------------
+Accuracy  = 83.40%
+Precision = 89.64%
+Recall 	  = 75.15%
+F-mesaure = 81.76%
+Genres pre movie  = 2.8324
+Average plot size = 50.6264
+Most common words = music(1863),film(1064),band(784),perform(759),live(710),life(675),show(630),stori(541),song(520),world(519)
+Other genres      = documentary(890),short(881),drama(559),comedy(453),biography(284),romance(254),family(159),history(158),animation(151),fantasy(114)
+--------------- musical---------------
+Accuracy  = 76.80%
+Precision = 77.99%
+Recall 	  = 74.55%
+F-mesaure = 76.23%
+Genres pre movie  = 3.0776
+Average plot size = 54.8318
+Most common words = love(1265),music(1164),find(845),life(759),live(739),film(637),marri(631),meet(576),make(567),girl(564)
+Other genres      = comedy(1091),short(710),drama(687),romance(658),family(421),animation(246),fantasy(228),documentary(195),music(152),adventure(142)
+--------------- mystery---------------
+Accuracy  = 74.30%
+Precision = 79.01%
+Recall 	  = 68.09%
+F-mesaure = 73.15%
+Genres pre movie  = 3.4344
+Average plot size = 53.2812
+Most common words = find(1087),murder(982),man(748),mysteri(744),life(685),young(613),friend(552),live(540),year(527),film(521)
+Other genres      = drama(1237),thriller(938),short(831),crime(607),horror(437),comedy(304),romance(271),fantasy(250),action(230),adventure(211)
+--------------- news---------------
+Accuracy  = 85.10%
+Precision = 83.91%
+Recall 	  = 86.77%
+F-mesaure = 85.32%
+Genres pre movie  = 3.2852
+Average plot size = 50.493
+Most common words = film(1323),peopl(835),stori(787),documentari(744),live(743),world(706),year(679),life(579),citi(478),commun(476)
+Other genres      = documentary(2020),short(1147),history(627),drama(445),biography(429),family(211),war(155),comedy(123),adventure(102),crime(96)
+--------------- reality-tv---------------
+Accuracy  = 87.05%
+Precision = 88.86%
+Recall 	  = 84.72%
+F-mesaure = 86.74%
+Genres pre movie  = 1.444096133751306
+Average plot size = 50.02873563218391
+Most common words = show(919),seri(694),live(622),world(566),famili(471),life(466),team(435),episod(397),make(372),realiti(371)
+Other genres      = documentary(137),comedy(104),game-show(96),adventure(72),music(53),short(45),family(43),drama(41),action(32),sport(28)
+--------------- romance---------------
+Accuracy  = 73.40%
+Precision = 70.58%
+Recall 	  = 75.05%
+F-mesaure = 72.75%
+Genres pre movie  = 3.0624
+Average plot size = 53.6338
+Most common words = love(1935),life(1043),find(987),young(790),meet(752),man(728),live(718),marri(688),friend(653),father(634)
+Other genres      = drama(1448),comedy(988),short(642),action(238),adventure(185),crime(172),fantasy(171),family(148),thriller(142),musical(142)
+--------------- sci-fi---------------
+Accuracy  = 83.60%
+Precision = 85.09%
+Recall 	  = 80.17%
+F-mesaure = 82.55%
+Genres pre movie  = 3.2008
+Average plot size = 52.056
+Most common words = world(962),find(937),earth(716),time(703),life(701),year(661),human(636),alien(556),man(547),power(529)
+Other genres      = short(873),action(722),drama(541),comedy(488),thriller(475),adventure(461),horror(443),fantasy(384),animation(336),mystery(195)
+--------------- short---------------
+Accuracy  = 72.10%
+Precision = 74.70%
+Recall 	  = 70.86%
+F-mesaure = 72.73%
+Genres pre movie  = 2.63
+Average plot size = 49.7864
+Most common words = film(839),life(681),man(582),young(519),find(515),time(505),stori(480),live(472),love(454),world(438)
+Other genres      = drama(903),comedy(648),documentary(452),animation(221),family(216),thriller(175),romance(168),horror(144),fantasy(141),biography(132)
+--------------- sport---------------
+Accuracy  = 89.30%
+Precision = 94.26%
+Recall 	  = 84.06%
+F-mesaure = 88.87%
+Genres pre movie  = 2.9308
+Average plot size = 52.2518
+Most common words = team(1189),world(938),sport(759),year(743),film(714),game(696),life(653),stori(626),race(574),player(524)
+Other genres      = documentary(1045),short(739),drama(674),comedy(422),action(393),biography(292),family(278),adventure(259),romance(173),history(117)
+--------------- talk-show---------------
+Accuracy  = 92.96%
+Precision = 97.44%
+Recall 	  = 87.02%
+F-mesaure = 91.94%
+Genres pre movie  = 1.5587392550143266
+Average plot size = 48.95558739255014
+Most common words = show(770),host(336),talk(296),film(267),live(260),interview(258),guest(214),discuss(166),entertain(158),world(158)
+Other genres      = comedy(114),news(55),music(46),short(29),family(27),reality-tv(22),documentary(15),biography(13),drama(13),horror(8)
+--------------- thriller---------------
+Accuracy  = 73.30%
+Precision = 73.35%
+Recall 	  = 72.01%
+F-mesaure = 72.67%
+Genres pre movie  = 3.062
+Average plot size = 53.833
+Most common words = find(1014),life(837),man(764),murder(678),kill(647),year(588),young(581),live(567),friend(561),world(486)
+Other genres      = drama(1189),short(653),crime(593),horror(558),action(523),mystery(504),comedy(237),sci-fi(227),romance(152),adventure(131)
+--------------- war---------------
+Accuracy  = 85.50%
+Precision = 90.16%
+Recall 	  = 78.89%
+F-mesaure = 84.15%
+Genres pre movie  = 3.2676
+Average plot size = 53.224
+Most common words = war(2315),world(836),soldier(822),film(790),stori(763),life(679),german(664),american(618),armi(608),year(589)
+Other genres      = drama(1391),documentary(687),history(677),short(666),action(420),romance(306),biography(248),adventure(241),comedy(197),thriller(165)
+--------------- western---------------
+Accuracy  = 91.80%
+Precision = 96.80%
+Recall 	  = 87.14%
+F-mesaure = 91.72%
+Genres pre movie  = 2.414
+Average plot size = 57.2688
+Most common words = town(1101),gang(1089),find(1069),ranch(1026),kill(939),man(835),sheriff(765),indian(655),father(634),outlaw(633)
+Other genres      = action(591),short(481),drama(468),romance(406),adventure(388),comedy(304),music(155),history(93),crime(90),documentary(68)

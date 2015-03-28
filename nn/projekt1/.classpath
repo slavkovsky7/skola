@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-math3/3.2/commons-math3-3.2.jar" sourcepath="M2_REPO/org/apache/commons/commons-math3/3.2/commons-math3-3.2-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/martin/.m2/repository/org/apache/commons/commons-math3/3.2/commons-math3-3.2-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+</classpath>
