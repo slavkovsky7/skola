@@ -16,17 +16,23 @@ function [h, y, h_net, y_net] = forward_pass(x, w_hid, w_out)
     y_net = w_out * h;
     y = logsig(y_net);     
 endfunction
+
+
 % =======================
 clear
-load iris
+%load iris
+
+data = load('-ascii','2d.trn.dat');
+
+data = data'
 
 [n_input,n_data] = size(data);
 n_out = max(data(n_input,:));
 data = data(:,randperm(n_data));
 
 % rozdel data na trenovaci a na testovaci set
-train_set = data(:,1:120);
-test_set = data(:,121:150);
+train_set = data(:,1:800);
+test_set = data(:,700:end);
 
 n_train = size(train_set,2);
 n_test = size(test_set,2);
@@ -44,12 +50,10 @@ w_hid
 w_out
 size(w_out)
 
-quit
-
 errors = [];
 E = 1;
 ep = 0;
-while (E > 0.9 && ep < 2000 )
+while (E > 0.9 && ep < 10000 )
 %for ep = 1 : 100
    ep++;
    E = 0;
@@ -67,6 +71,7 @@ while (E > 0.9 && ep < 2000 )
         target = zeros(n_out,1);
         target(train_set(n_input,t)) = 1;
 
+        y = y > 0.5;
         %vyrataj chybu na vrstvach
         e = (1/2)*sum( (target - y ).^2 );
           
@@ -76,8 +81,8 @@ while (E > 0.9 && ep < 2000 )
           w_out = w_out + alpha*(delta_out*h');
            
           w_out_unbias = w_out(:, 1:end-1);
-		      delta_hid = (w_out_unbias'*delta_out).*logsig_der(h_net);
-		      w_hid = w_hid + alpha*delta_hid*x';
+	  delta_hid = (w_out_unbias'*delta_out).*logsig_der(h_net);
+	  w_hid = w_hid + alpha*delta_hid*x';
         end
        E += e;
    end
@@ -85,8 +90,10 @@ while (E > 0.9 && ep < 2000 )
 
    errors = [errors , E];
    
-   E
-   ep
+   if mod(ep, 10) == 0
+    E
+    ep
+   end
 end
 figure;
 plot(errors);

@@ -24,7 +24,8 @@ dw_hid = zeros(n_hid,n_input);
 errors = [];
 E = 0;
 %while (E > 0.05)
-for ep = 1 : 30000
+time = cputime;
+for ep = 1 : 10000
    % trenovanie
    E = 0;
    train_set = train_set(:,randperm(n_train));
@@ -42,7 +43,7 @@ for ep = 1 : 30000
        % DOPLN - backward pass + trenovanie
        sigma_out = target - y;
 
-       E += (target - y )^2;
+       E += (1/2)*(target - y )^2;
 
        w_out_unbias = w_out(:, 1:end-1);
        h_unbias = h(1:end-1);
@@ -59,6 +60,8 @@ for ep = 1 : 30000
     if mod(ep, 10) == 0
       ep
       E
+      time = cputime - time
+      time = cputime;
     end
 end
 

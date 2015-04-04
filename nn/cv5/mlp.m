@@ -1,16 +1,11 @@
 
-function [h, y, h_net] = forward_pass(x, w_hid, w_out)
-    h_net = [w_hid * x];
-    h = [logsig(h_net);-1];
-    y = w_out * h;
-endfunction
-
-function [yy] = logsig_der(net)
-	yy = logsig(net);
-	for ix=1:size(net,1)
-	    for iy=1:size(net,2)
-	        yy(ix,iy) = yy(ix,iy)*(1 - yy(ix,iy) );
-	    end
+function [h,y] = forward_pass(x, w)
+	x = x(1:end-1);
+	h{1} = x;
+	h_net{1} = x; 
+	for i = 2 : size(w,2) + 1
+    	y = w{i-1} * [h{i-1};-1];
+    	h{i} = logsig(y);
 	end
 endfunction
 
@@ -19,7 +14,7 @@ clear
 load train_set
 load test_set
 
-n_input = 1+1;
+n_input = 1;
 n_out = 1;
 
 n_train = size(train_set,2);
@@ -27,57 +22,75 @@ n_test = size(test_set,2);
 
 %vygeneruj vahy, nastav parametre
 alpha = 0.1;   %  <--- uprav
-mih = 0.65;
-mio = 0.55;
-n_hid = 10;     %  <--- uprav
+layers = [ n_input, 10 , n_out ] ;     %  <--- uprav
+m = [0.65, 0.55, 0.50 ]
+%w(i) = rand(vstupy, vystupy + 1(bias) 
+w = [];
+dw = [];
 
-w_hid = rand(n_hid,n_input);
-w_out = rand(n_out,n_hid+1);
+for i = 2 : size(layers,2)
+	w{i - 1} = rand( layers(i) ,layers(i-1) + 1);
+	dw{i - 1} = zeros(size(w{i-1}));
+end
 
-dw_hid = zeros(n_hid,n_input);
-dw_out = zeros(n_out,n_hid+1);
+
 
 errors = [];
 E = 1;
-ep = 0
-while ( ep < 30000 )
+ep = 0;
+
+time = cputime;
+
+minE = 100000;
+minW = w;
+
+while ( ep < 1000 )
   	E = 0;
    	ep++;
    	train_set = train_set(:,randperm(n_train));
 	for t=1:n_train
 
 		x = train_set(:,t);
-		x(end) = -1; %bias
-		[h, y, h_net] = forward_pass(x, w_hid, w_out);
+		[h, y] = forward_pass( x, w );
 
+		%%%%% Vyratanie targetu a chyby %%%%%%
+		target = train_set(n_input + 1,t);
+		e = (1/2)*(target - y )^2;
 
-		target = train_set(n_input,t);
-		e = (target - y )^2;
-		%trenovanie
-		delta_out = (target - y);
+		%%%%%%%%%%%%%%%%%%%%%%%%%%
+		for i = size(w,2): -1 : 1
+			if i == size(w,2)
+				delta{i} = target - y;
+			else
+				w_unbias = w{i+1}(:,1:end-1);
+				%h_unbias = h{i+1}(1:end-1,:);
+				delta{i} = (w_unbias'*delta{i+1}).*(h{i+1}.*(1 - h{i+1})); 	
 
-	   	
-		w_out = w_out + alpha*(delta_out*h') + mio*dw_out;
-		%dw_out = alpha*(delta_out*h');
-
-		w_out_unbias = w_out(:, 1:end-1);
-		delta_hid = (w_out_unbias'*delta_out).*logsig_der(h_net);
-		w_hid = w_hid + alpha*delta_hid*x' ;
-		%dw_hid = alpha*delta_hid*x' + mih*dw_hid;
-		%  <--- dopln
+			end
+			tmp = alpha*delta{i}*([h{i};-1]');%; + m(i)*dw{i};	
+			w{i} = w{i} + tmp;
+			%dw{i} = tmp;
+      		
+		end
+		%%%%%%%%%%%%%%%%%%%%%%%%%%
 	   	E += e;
 
    	end
 
-
-   	%%%%%%%%%%%%%%%%%%%%%%%
    	if mod(ep, 10) == 0
 	   	ep
 	   	E
+	   	time = cputime - time
+	   	time = cputime;
+   	end
+
+   	if E < minE
+   		minE = E;
+   		minW = w;
    	end
 end
 
-
+w = minW;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % testovanie
@@ -89,9 +102,8 @@ E = 0;
 for j=1:n_test    
     %prechod
        x = test_set(:, j);
-       x(end) = -1;
        % DOPLN - forward pass
-       [h, y, h_net] = forward_pass(x, w_hid, w_out);
+       [h, y] = forward_pass(x, w);
        
    	   % vyratanie targetu
    	   target = test_set(n_input,j);
@@ -112,10 +124,8 @@ for j=1:size(data,2)
         
        %prechod
        x = data(:, j);
-       x(end) = -1;
        % DOPLN - forward pass
-       h = [logsig(w_hid * x); -1];
-       y = w_out * h;
+       [h, y] = forward_pass(x, w);
        
        plot_data(j,1) = y;
        plot_data(j,2) = data(2,j);
