@@ -2,9 +2,11 @@ package sk.mslavkovsky.nn;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 public class Utils {
@@ -31,14 +33,22 @@ public class Utils {
 	
 	
 	public static void plot(File file) throws IOException, InterruptedException{
-		Utils.cmd("gnuplot -p " + file, true, false);
+		Utils.cmd("gnuplot -p " + file, true, true);
 	}
 
 	
 	public static List<RealVector> deepCopy(List<RealVector> source) {
 	    List<RealVector> result = new ArrayList<RealVector>();
 	    for(RealVector el : source) {
-	        result.add( el );
+	        result.add( el.copy() );
+	    }
+	    return result;
+	}
+	
+	public static List<RealMatrix> deepCopyMat(List<RealMatrix> source) {
+	    List<RealMatrix> result = new ArrayList<RealMatrix>();
+	    for(RealMatrix el : source) {
+	        result.add( el.copy() );
 	    }
 	    return result;
 	}

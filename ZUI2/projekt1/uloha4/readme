@@ -1,0 +1,19 @@
+1.Buying price 			= [low,med,high,vhigh] = [1 2 3 4]
+2.Price of maintenance  = [low,med,high,vhigh] = [1 2 3 4]
+3.Number of doors 		= [2,3,4,5more] 	   = [2,3,4,5]
+4.Person capacity		= [2,4,more]		   = [2,4,5] 
+5.Size of luggage boot	= [small,med,big]	   = [1,2,3]
+6.Safety				= [low,med,high]	   = [1,2,3]
+
+-------------------------
+7.Acceptable			= [unacc,acc,good,vgood] = [1,2,3,4]
+
+
+
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Je to robene v octave!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
