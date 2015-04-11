@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,16 +24,40 @@ import org.apache.commons.math3.linear.RealVector;
 import org.w3c.dom.ls.LSInput;
 
 public class MultiLayerNN {
-	private List<RealMatrix> w; 
-	private List<RealVector> xdata = new ArrayList<RealVector>();
-	private List<RealVector> ydata = new ArrayList<RealVector>();
 	
-	private List<RealVector> xdata_test = new ArrayList<RealVector>();
-	private List<RealVector> ydata_test = new ArrayList<RealVector>();
 	
+	private static class InputDataContainer
+	{
+		public List<RealVector> x;
+		public List<RealVector> y;
+		
+		public InputDataContainer(){
+			this.x = new ArrayList<RealVector>();
+			this.y = new ArrayList<RealVector>();
+		}
+		
+		public InputDataContainer(List<RealVector> x, List<RealVector> y){
+			this.x = x;
+			this.y = y;
+		}
+		
+		public InputDataContainer copy(){
+			InputDataContainer result = new InputDataContainer();
+			result.x = Utils.deepCopy(this.x);
+			result.y = Utils.deepCopy(this.y);
+			return result;
+		}
+	}
+	/*************************************/
+	
+	private List<List<RealMatrix>> w; 
+	//private List<RealVector> xdata = new ArrayList<RealVector>();
+	//private List<RealVector> ydata = new ArrayList<RealVector>();
+	private int dimension;
+	private InputDataContainer data;
 	
 	private int[] layers;
-	public int MAX_EPOCH_COUNT = 10000;
+	public int MAX_EPOCH_COUNT = 5000;
 	public double alpha = 0.1;
 	public double TRESHOLD = 0.5d;
 	public int CHECK_FREQUENCY = 100;
@@ -46,20 +71,15 @@ public class MultiLayerNN {
 	public static final File SCRIPT_FILE= new File(GENERATED_DIR,"generated-plot-code.gnuplot");
 	public static final File OUT_PLOT_DIR = new File(GENERATED_DIR,"output" );
 	
-	
-	
 	public MultiLayerNN(File f, File testFile, int inputSize, int[] hiddenLayers) throws FileNotFoundException{
-		load(f, inputSize, xdata, ydata);
-		load(f, inputSize, xdata_test, ydata_test);
-		
+		data = load(f, inputSize);
+		dimension = inputSize;
 		this.layers = new int[hiddenLayers.length + 2];
-		this.layers[0] = xdata.get(0).getDimension();
+		this.layers[0] = data.x.get(0).getDimension();
 		for (int i = 0 ; i < hiddenLayers.length; i++){
 			layers[i+1] = hiddenLayers[i];
 		}
-		this.layers[ layers.length - 1 ] = ydata.get(0).getDimension();
-		
-		//TODO::Kontrola na vstupy
+		this.layers[ layers.length - 1 ] = data.y.get(0).getDimension();
 	}
 	
 	public void printData(List<RealVector> xxdata, List<RealVector> yydata){
@@ -67,9 +87,9 @@ public class MultiLayerNN {
 			System.out.println( xxdata.get(i).toString() + " -> " + yydata.get(i));
 		}
 	}
+
 	
-	
-	private void load(File f, int inputSize, List<RealVector> outXData, List<RealVector> outYData) throws FileNotFoundException{
+	private InputDataContainer load(File f, int inputSize) throws FileNotFoundException{
 		Scanner scanner = new Scanner(f);
 		ArrayList<double[]> xPremim = new ArrayList<double[]>();
 		ArrayList<String>	yPrelim = new ArrayList<String>();
@@ -87,8 +107,8 @@ public class MultiLayerNN {
 		}	
 		scanner.close();
 		
-		outXData.clear();
-		outYData.clear();
+		InputDataContainer result = new InputDataContainer();
+		
 		
 		int i = 0;
 		for ( String className : classNames){
@@ -100,9 +120,11 @@ public class MultiLayerNN {
 		}
 		
 		for ( i = 0; i < xPremim.size(); i++){
-			outXData.add( new ArrayRealVector( xPremim.get(i) ) );
-			outYData.add( classToVector.get(yPrelim.get(i)).copy() );
+			result.x.add( new ArrayRealVector( xPremim.get(i) ) );
+			result.y.add( classToVector.get(yPrelim.get(i)).copy() );
 		}
+		
+		return result;
 	}
 		
 	private static void shufftle(List<RealVector> xxdata, List<RealVector> yydata){
@@ -206,8 +228,10 @@ public class MultiLayerNN {
 		for (int k = 0; k < kFoldFactor; k++){
 			
 			List<RealVector> trainList = Utils.deepCopy(data);
-			for (int j = k*chunkSize ; j < k*chunkSize + chunkSize; j++){
-				trainList.remove(k*chunkSize);
+			if (kFoldFactor > 1){
+				for (int j = k*chunkSize ; j < k*(chunkSize + 1); j++){
+					trainList.remove(k*chunkSize);
+				}
 			}
 			result.add( trainList );
 			
@@ -248,107 +272,107 @@ public class MultiLayerNN {
 		}
 	}
 	
-	public void train(int kFoldFactor, int testSetPercentage) throws IOException, InterruptedException{
-		List<RealVector> xtrain = Utils.deepCopy(xdata);
-		List<RealVector> ytrain = Utils.deepCopy(ydata);
+	//Vracia pole hodnot, kde result[0] je priemer hodnot, dalej su pre jednotlive modely
 	
-		List<RealVector> xtest = Utils.deepCopy(xdata_test);
-		List<RealVector> ytest = Utils.deepCopy(ydata_test);
+	public double[] testData(File f) throws FileNotFoundException{
+		return testData( load(f, dimension) );
+	}
+	
+	public double[] testData(InputDataContainer d){
+		double[] result = new double[w.size() + 1];
 		
-		xtrain = normalizeInputs( xtrain );
+		List<RealVector> xtest = Utils.deepCopy(d.x);
+		List<RealVector> ytest = Utils.deepCopy(d.y);
 		xtest = normalizeInputs(xtest);
-		
-		shufftle(xtrain, ytrain);
 		shufftle(xtest, ytest);
-		//int trainMaxIndex = (xtrain.size() / testSetPercentage ) * (testSetPercentage - 1);
-		//List<RealVector> xtest = xtrain.subList(trainMaxIndex, xtrain.size() - 1);
-		//List<RealVector> ytest = ytrain.subList(trainMaxIndex, ytrain.size() - 1);		
-		//xtrain = Utils.deepCopy( xtrain.subList(0, trainMaxIndex - 1) );
-		//ytrain = Utils.deepCopy( ytrain.subList(0, trainMaxIndex - 1) );
 		
-		
-		//k-fold cross validation split
+		double sum = 0;
+		for ( int i = 1; i < result.length; i++ ){
+			result[i] = validate( w.get(i-1), xtest, ytest);
+			sum += result[i];
+		}
+		result[0] = sum / w.size();
+		return result;
+	}
+	
+	public void train(int kFoldFactor) throws IOException, InterruptedException{
+		train(kFoldFactor,kFoldFactor,kFoldFactor);				
+	}
+	
+
+	public void train(int kFactor, int repeatTrainFactor, int splitFactor) throws IOException, InterruptedException{
+		List<RealVector> xtrain = Utils.deepCopy(data.x);
+		List<RealVector> ytrain = Utils.deepCopy(data.y);
+
+		xtrain = normalizeInputs( xtrain );
 		shufftle(xtrain, ytrain);
-		//printData(xtrain, ytrain);
-		System.out.println(" ============= Original ============= ");
-		plotData(new File(OUT_PLOT_DIR, "expected.png"),xtrain, ytrain);
+		shufftle(xtrain, ytrain);
 		
-		List<List<RealVector>>  subsetsX = getKSubSets(xtrain, kFoldFactor);
-		List<List<RealVector>>  subsetsY = getKSubSets(ytrain, kFoldFactor);
-		
-		List<List<RealMatrix>> bestWeightsList = null;
+		List<List<RealVector>>  subsetsX = getKSubSets(xtrain, splitFactor);
+		List<List<RealVector>>  subsetsY = getKSubSets(ytrain, splitFactor);
+
 		double maxCV = -10; 
+		ExecutorService service = Executors.newFixedThreadPool(4);
+		List<List<TrainThread>> trainTaskAll = new ArrayList<List<TrainThread>>();
+		List<InputDataContainer> subValids = new ArrayList<MultiLayerNN.InputDataContainer>();
+		for ( int i = 0 ; i < kFactor; i++){
+			List<RealVector> subtrainx = subsetsX.get(2*i);
+			List<RealVector> subtrainy = subsetsY.get(2*i);
 		
-		for ( int i = 0 ; i < subsetsX.size(); i+=2){
-			List<RealVector> subtrainx = subsetsX.get(i);
-			List<RealVector> subtrainy = subsetsY.get(i);
-		
-			List<RealVector> subvalidx = subsetsX.get(i+1);
-			List<RealVector> subvalidy = subsetsY.get(i+1);
+			List<RealVector> subvalidx = subsetsX.get(2*i+1);
+			List<RealVector> subvalidy = subsetsY.get(2*i+1);
 			
-			System.out.println("------------- Training "+i+"-th model ------------- ");
-			plotData(new File(OUT_PLOT_DIR, "expected_train_"+i+".png"),subtrainx,subtrainy);
-			Thread.sleep(1000);
-			plotData(new File(OUT_PLOT_DIR, "expected_valid_"+i+".png"),subvalidx, subvalidy);
+			subValids.add( new InputDataContainer( subvalidx, subvalidy ) );
 			
+			if (VERBOSE){
+				System.out.println("------------- Training "+i+"-th model ------------- ");
+				plotData(new File(OUT_PLOT_DIR, "expected_train_"+i+".png"),subtrainx,subtrainy);
+				Thread.sleep(100);
+				plotData(new File(OUT_PLOT_DIR, "expected_valid_"+i+".png"),subvalidx, subvalidy);
+			}
 			
-			
-			ExecutorService service = Executors.newFixedThreadPool(4);
 			List<TrainThread> trainTasks = new ArrayList<TrainThread>();
-			for (int k = 0 ; k < kFoldFactor; k++){
+			for (int k = 0 ; k < repeatTrainFactor; k++){
 				TrainThread t = new TrainThread(subtrainx, subtrainy, subvalidx, subvalidy);
 				trainTasks.add( t );
 				service.execute(t);
-				//TODO::
 			} 
+			trainTaskAll.add(trainTasks);
+		}
 			
-			service.shutdown();
-			service.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			
-			
+		service.shutdown();
+		service.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		
+		for ( int i = 0 ; i < kFactor; i++){
 			List<List<RealVector>> trainErrorsLists = new ArrayList<List<RealVector>>();
 			List<List<RealVector>> validErrorsLists = new ArrayList<List<RealVector>>();
 			List<List<RealMatrix>> weightsList = new ArrayList<List<RealMatrix>>();
-			System.out.println("..................................");
 			double CV = 0;
-			for (int k = 0 ; k < kFoldFactor; k++){
-				TrainThread t = trainTasks.get(k);
-				double accuracy = validate(t.weights, subvalidx, subvalidy);
-				System.out.println("Resulting validation accuracy  = " + accuracy);
+			for (int k = 0 ; k < repeatTrainFactor; k++){
+				TrainThread t = trainTaskAll.get(i).get(k);
+				double accuracy = validate(t.weights, subValids.get(i).x, subValids.get(i).y);
 				trainErrorsLists.add(t.trainErrors);
 				validErrorsLists.add(t.validErrors);
-				plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_"+k+".png"), t.trainErrors, t.validErrors);
-
 				CV += accuracy;
-				
 				weightsList.add(t.weights);
+				
+				if (VERBOSE){
+					plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_"+k+".png"), t.trainErrors, t.validErrors);
+				}
 			}
-			CV = CV / kFoldFactor;
+			CV = CV / repeatTrainFactor;
 
 			List<RealVector> trainErrors = getAverage(trainErrorsLists);
 			List<RealVector> validErrors = getAverage(validErrorsLists);
-			plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_avg.png"), trainErrors, validErrors);
-			
-			System.out.println("CrossValidation coeficient = " + CV);
+			if (VERBOSE){
+				plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_avg.png"), trainErrors, validErrors);
+				System.out.println("CrossValidation coeficient = " + CV);
+			}
 			if (CV > maxCV){
 				maxCV = CV;
-				bestWeightsList = weightsList;
+				w = weightsList;
 			}
-			
-			//TODO:: test data accuracy
 		}	
-		
-		
-		System.out.println("================ Testing model on test data ================ ");
-		double avg = 0;
-		for ( List<RealMatrix> weights : bestWeightsList ){
-			double accuracy = validate(weights, xtest, ytest);
-			avg += accuracy;
-			System.out.println("Testing accuracy = " + accuracy);
-		}
-		avg /= bestWeightsList.size();
-		
-		System.out.println("Average testing accuracy = " + avg);
 	}
 	
 	private List<RealVector> getAverage( List<List<RealVector>> lists){
@@ -399,9 +423,7 @@ public class MultiLayerNN {
 			E = 0;
 			shufftle( xtrain , ytrain );
 			
-			//DEBUG::
 			List<RealVector> ypredicted = new ArrayList<RealVector>();
-			//DEBUG::
 			for (int i = 0 ; i < xtrain.size(); i++){
 				
 				RealVector x = xtrain.get(i);
@@ -412,16 +434,7 @@ public class MultiLayerNN {
 				RealVector cout = classify(y);
 				double e = (0.5d)* getError(target, cout);
 				
-				//DEBUG::
 				ypredicted.add(classify(y));
-				
-				//DEBUG::
-				
-				//System.out.println(e);
-				//System.out.println(x);
-				//System.out.println(target);
-				//System.out.println(y);
-				//System.out.println("------------------------");
 				
 				if ( e > 0){
 					RealVector[] delta = new RealVector[weights.size()]; 
@@ -519,24 +532,23 @@ public class MultiLayerNN {
 		}
 		pw.println(plotCmd);
 		pw.close();
-		
-		//TODO:: vylepsit
-		//Utils.cmd("killall gnuplot",false);
 		Utils.plot(SCRIPT_FILE);
-		//Thread.sleep(50);
-		//Utils.cmd("cd "+SCRIPT_FILE.getAbsoluteFile().getParent()+" &&  tail -f  "+SCRIPT_FILE.getAbsolutePath()+" | gnuplot  '-'", false, false);
 		
 	}
 	
-	private void plotErrorCurve( File outPut, List<RealVector> trainErrors , List<RealVector> validErrors) throws IOException, InterruptedException{
+	public static void plotErrorCurve( File outPut, List<RealVector> trainErrors , List<RealVector> validErrors) throws IOException, InterruptedException{
+		plotErrorCurve(outPut, trainErrors, validErrors, "epoch" , "error");
+	}
+	
+	public static void plotErrorCurve( File outPut, List<RealVector> x , List<RealVector> y, String xname, String yname) throws IOException, InterruptedException{
 		File trainErrorsFile = new File(GENERATED_DIR, "generated-train-errors.dat");
 		File validErrorsFile = new File(GENERATED_DIR, "generated-valid-errors.dat");
 		
 		PrintWriter pwT = new PrintWriter(trainErrorsFile);
 		PrintWriter pwV = new PrintWriter(validErrorsFile);
-		for (int i = 0; i < trainErrors.size(); i++){
-			RealVector vT = trainErrors.get(i);
-			RealVector vV = validErrors.get(i);
+		for (int i = 0; i < x.size(); i++){
+			RealVector vT = x.get(i);
+			RealVector vV = y.get(i);
 			pwT.println( vT.getEntry(0) + " " + vT.getEntry(1) );
 			pwV.println( vV.getEntry(0) + " " + vV.getEntry(1) );
 		}
@@ -546,8 +558,8 @@ public class MultiLayerNN {
 		PrintWriter pw = new PrintWriter(SCRIPT_FILE);
 		pw.println( "set terminal png size 1024,768");
 		pw.println( "set output '"+outPut+"'");
-		pw.println("set xlabel \"epoch\" ");
-		pw.println("set ylabel \"error\" ");
+		pw.println("set xlabel \""+xname+"\" ");
+		pw.println("set ylabel \""+yname+"\" ");
 		pw.println("set style line 1 lc rgb 'red' lt 1 lw 2 pt 7 ps 0.5"); 
 		pw.println("plot \""+trainErrorsFile.getAbsoluteFile()+"\" with lines ls 1, \""+validErrorsFile.getAbsolutePath()+"\" with lines ls 2");	
 		pw.close();	
@@ -567,15 +579,61 @@ public class MultiLayerNN {
 		return okCount / xxdata.size();
 	}
 	
+	/*******************************************/
+	public static final int FOLD_FACTOR = 8;
+	public static final int INPUT_SIZE = 2;
+	
+	///
+	private static void kfoldTest(File train, File test) throws Exception {
+		int[] layers = new int[]{10,9,8};
+		MultiLayerNN nn = new MultiLayerNN(train,test,INPUT_SIZE, layers);
+		nn.MAX_EPOCH_COUNT = 1000;
+		System.out.println("Training with model : " + Arrays.toString(layers));
+		nn.train(1,1,8);
+		
+	
+		double[] test_accuracy = nn.testData(test );
+		double[] train_accuracy = nn.testData(train );
+		
+		
+		for (int i = 1 ; i < test_accuracy.length; i++){
+			System.out.println("Partial test  accuracy = " + test_accuracy[i] );
+			System.out.println("Partial train accuracy = " + train_accuracy[i] );
+		}
+		System.out.println("Average test  accuracy = " + test_accuracy[0] );
+		System.out.println("Average train accuracy = " + train_accuracy[0] );
+	}
+	
+	private static void overfitexample(File train, File test) throws Exception {
+		List<RealVector> trainErrors = new ArrayList<RealVector>(); 
+		List<RealVector> testErrors = new ArrayList<RealVector>();
+		for (int i = 5; i < 200; i+=10){
+			System.out.println("Training model with " + i+ " hidden neuronos");
+			MultiLayerNN nn = new MultiLayerNN(train,test,INPUT_SIZE, new int[]{i});
+			nn.MAX_EPOCH_COUNT = 500;
+		
+			nn.train(4,4,10);
+			
+			double[] test_accuracy = nn.testData(test );
+			double[] train_accuracy = nn.testData(train );
+			
+			trainErrors.add( new ArrayRealVector(new double[]{i, 1-train_accuracy[0]  } ) );
+			testErrors.add ( new ArrayRealVector(new double[]{i, 1-test_accuracy[0] } ) );
+			
+		}
+		
+		plotErrorCurve(new File(OUT_PLOT_DIR, "overfit.png"), trainErrors, testErrors, "number of neurons", "error");
+	}
+	
 	public static void main(String[] args){
 		//URL url = Thread.currentThread().getContextClassLoader().getResource("2d.trn.dat");
 		
-		File f = new File ("src/main/resources/2d.trn.dat");
+		File train = new File ("src/main/resources/2d.trn.dat");
 		File test = new File ("src/main/resources/2d.tst.dat");
+		
 		try {
-			MultiLayerNN nn = new MultiLayerNN(f,test,2, new int[]{10,9,8});
-			nn.train(8, 10);
-			//nn.printData();
+			kfoldTest(train, test);
+			//overfitexample(train, test);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

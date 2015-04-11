@@ -3,6 +3,7 @@ package sk.mslavkovsky.nn;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
+import java.security.cert.CertPathValidatorException.Reason;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,5 +52,13 @@ public class Utils {
 	        result.add( el.copy() );
 	    }
 	    return result;
+	}
+	
+	public static double average(List<Double> l){
+		double result = 0;
+		for (Double d : l){
+			result+= d;
+		}
+		return result / l.size();
 	}
 }
