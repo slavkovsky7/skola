@@ -71,7 +71,7 @@ public class MultiLayerNN {
 	public static final File SCRIPT_FILE= new File(GENERATED_DIR,"generated-plot-code.gnuplot");
 	public static final File OUT_PLOT_DIR = new File(GENERATED_DIR,"output" );
 	
-	public MultiLayerNN(File f, File testFile, int inputSize, int[] hiddenLayers) throws FileNotFoundException{
+	public MultiLayerNN(File f, int inputSize, int[] hiddenLayers) throws FileNotFoundException{
 		data = load(f, inputSize);
 		dimension = inputSize;
 		this.layers = new int[hiddenLayers.length + 2];
@@ -207,18 +207,26 @@ public class MultiLayerNN {
 		return result;
 	}
 	
-	private static List<RealVector> normalizeInputs(List<RealVector> data){
-
+	private static RealVector mean(List<RealVector> data){
 		RealVector average = new ArrayRealVector(data.get(0).getDimension());
 		for (RealVector v : data ) {
 			average = average.add(v);
 		}
 		average = average.mapMultiply( 1d/data.size());
+		return average;
+	}
+	
+	private static List<RealVector> normalizeInputs(List<RealVector> train, List<RealVector> test){
+		RealVector average = mean(train);
 		List<RealVector> result = new ArrayList<RealVector>();
-		for (RealVector v : data ) {
+		for (RealVector v : train ) {
 			result.add( v.subtract(average) );
 		}
 		return result;
+	}
+	
+	private static List<RealVector> normalizeInputs(List<RealVector> data){
+		return normalizeInputs(data, data);
 	}
 	
 	//na i pozicii je je trenovacia, na i + 1 je {trenovacia - validacna}
@@ -253,11 +261,14 @@ public class MultiLayerNN {
 		private List<RealVector> subvalidx;
 		private List<RealVector> subvalidy;
 		
-		public TrainThread(List<RealVector> subtrainx, List<RealVector> subtrainy, List<RealVector> subvalidx, List<RealVector> subvalidy){
+		private String trainTag;
+		
+		public TrainThread(List<RealVector> subtrainx, List<RealVector> subtrainy, List<RealVector> subvalidx, List<RealVector> subvalidy, String trainTag ){
 			this.subtrainx = Utils.deepCopy(subtrainx);
 			this.subtrainy = Utils.deepCopy(subtrainy);
 			this.subvalidx = Utils.deepCopy(subvalidx);
 			this.subvalidy = Utils.deepCopy(subvalidy);
+			this.trainTag = trainTag;
 		}
 	
 		public void run(){
@@ -265,7 +276,9 @@ public class MultiLayerNN {
 			validErrors = new ArrayList<RealVector>();
 			
 			try{
-				weights = train(subtrainx, subtrainy, subvalidx, subvalidy, trainErrors, validErrors);
+				System.out.println(trainTag + " : Training start");
+				weights = train(subtrainx, subtrainy, subvalidx, subvalidy, trainErrors, validErrors, trainTag);
+				System.out.println(trainTag + " : Training done");
 			}catch(Exception ex){
 				throw new RuntimeException(ex);
 			}
@@ -283,7 +296,7 @@ public class MultiLayerNN {
 		
 		List<RealVector> xtest = Utils.deepCopy(d.x);
 		List<RealVector> ytest = Utils.deepCopy(d.y);
-		xtest = normalizeInputs(xtest);
+		xtest = normalizeInputs(xtest, data.x);
 		shufftle(xtest, ytest);
 		
 		double sum = 0;
@@ -295,25 +308,20 @@ public class MultiLayerNN {
 		return result;
 	}
 	
-	public void train(int kFoldFactor) throws IOException, InterruptedException{
-		train(kFoldFactor,kFoldFactor,kFoldFactor);				
-	}
 	
-
-	public void train(int kFactor, int repeatTrainFactor, int splitFactor) throws IOException, InterruptedException{
+	public double train(int kFactor) throws IOException, InterruptedException{
 		List<RealVector> xtrain = Utils.deepCopy(data.x);
 		List<RealVector> ytrain = Utils.deepCopy(data.y);
-
-		xtrain = normalizeInputs( xtrain );
+		
 		shufftle(xtrain, ytrain);
 		shufftle(xtrain, ytrain);
 		
-		List<List<RealVector>>  subsetsX = getKSubSets(xtrain, splitFactor);
-		List<List<RealVector>>  subsetsY = getKSubSets(ytrain, splitFactor);
+		List<List<RealVector>>  subsetsX = getKSubSets(xtrain, kFactor);
+		List<List<RealVector>>  subsetsY = getKSubSets(ytrain, kFactor);
 
-		double maxCV = -10; 
 		ExecutorService service = Executors.newFixedThreadPool(4);
-		List<List<TrainThread>> trainTaskAll = new ArrayList<List<TrainThread>>();
+		List<TrainThread> trainTaskAll = new ArrayList<TrainThread>();
+		
 		List<InputDataContainer> subValids = new ArrayList<MultiLayerNN.InputDataContainer>();
 		for ( int i = 0 ; i < kFactor; i++){
 			List<RealVector> subtrainx = subsetsX.get(2*i);
@@ -325,92 +333,41 @@ public class MultiLayerNN {
 			subValids.add( new InputDataContainer( subvalidx, subvalidy ) );
 			
 			if (VERBOSE){
-				System.out.println("------------- Training "+i+"-th model ------------- ");
 				plotData(new File(OUT_PLOT_DIR, "expected_train_"+i+".png"),subtrainx,subtrainy);
 				Thread.sleep(100);
 				plotData(new File(OUT_PLOT_DIR, "expected_valid_"+i+".png"),subvalidx, subvalidy);
 			}
 			
-			List<TrainThread> trainTasks = new ArrayList<TrainThread>();
-			for (int k = 0 ; k < repeatTrainFactor; k++){
-				TrainThread t = new TrainThread(subtrainx, subtrainy, subvalidx, subvalidy);
-				trainTasks.add( t );
-				service.execute(t);
-			} 
-			trainTaskAll.add(trainTasks);
+
+			TrainThread t = new TrainThread(subtrainx, subtrainy, subvalidx, subvalidy, ("kfold-"+i) );
+			service.execute(t);
+			trainTaskAll.add(t);
 		}
 			
 		service.shutdown();
 		service.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		
+		double CV = 0;	
+		w = new ArrayList<List<RealMatrix>>();
 		for ( int i = 0 ; i < kFactor; i++){
-			List<List<RealVector>> trainErrorsLists = new ArrayList<List<RealVector>>();
-			List<List<RealVector>> validErrorsLists = new ArrayList<List<RealVector>>();
-			List<List<RealMatrix>> weightsList = new ArrayList<List<RealMatrix>>();
-			double CV = 0;
-			for (int k = 0 ; k < repeatTrainFactor; k++){
-				TrainThread t = trainTaskAll.get(i).get(k);
-				double accuracy = validate(t.weights, subValids.get(i).x, subValids.get(i).y);
-				trainErrorsLists.add(t.trainErrors);
-				validErrorsLists.add(t.validErrors);
-				CV += accuracy;
-				weightsList.add(t.weights);
-				
-				if (VERBOSE){
-					plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_"+k+".png"), t.trainErrors, t.validErrors);
-				}
-			}
-			CV = CV / repeatTrainFactor;
-
-			List<RealVector> trainErrors = getAverage(trainErrorsLists);
-			List<RealVector> validErrors = getAverage(validErrorsLists);
+			
+			TrainThread t = trainTaskAll.get(i);	
+			double accuracy = validate(t.weights, subValids.get(i).x, subValids.get(i).y);
+			CV += accuracy;
+			w.add(t.weights);
 			if (VERBOSE){
-				plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+"_avg.png"), trainErrors, validErrors);
-				System.out.println("CrossValidation coeficient = " + CV);
-			}
-			if (CV > maxCV){
-				maxCV = CV;
-				w = weightsList;
+				plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+".png"), t.trainErrors, t.validErrors);
 			}
 		}	
+		
+		
+		return CV / kFactor;
 	}
 	
-	private List<RealVector> getAverage( List<List<RealVector>> lists){
-		if (lists.size() == 0){
-			throw new RuntimeException("Empty list");
-		}
-		
-		int maxSize = 0;
-		int indexMaxList = 0;
-		for (int i = 0;  i < lists.size();i++){
-			if (lists.get(i).size() > maxSize){
-				maxSize = lists.get(i).size();
-				indexMaxList = i;
-			}
-		}
-		
-		List<RealVector> result = new ArrayList<RealVector>(maxSize);
-		for (int i = 0; i < maxSize; i++){
-			result.add(new ArrayRealVector(new double[]{0,0}));
-		}
-		
-		for (int i = 0 ; i < lists.size(); i++){
-			for (int j = 0 ; j < lists.get(i).size(); j++){
-				RealVector tmp = result.get(j);
-				tmp = tmp.add( lists.get(i).get(j) );
-				result.set(j,tmp );
-			}
-		}
-		
-		for (int j = 0 ; j < result.size(); j++){
-			result.set(j, result.get(j).mapMultiply( 1d/ lists.size() ) );
-			result.get(j).setEntry(0, lists.get(indexMaxList).get(j).getEntry(0) );
-		}
-		return result;
-	}
-	
-	public List<RealMatrix> train(List<RealVector> xtrain, List<RealVector> ytrain, List<RealVector> xvalid, List<RealVector> yvalid, List<RealVector> trainErrors, List<RealVector> validErrors) throws IOException, InterruptedException{
-		
+	public List<RealMatrix> train(List<RealVector> xtrain, List<RealVector> ytrain, List<RealVector> xvalid, List<RealVector> yvalid, List<RealVector> trainErrors, List<RealVector> validErrors, String trainTag) throws IOException, InterruptedException{
+				
+		xtrain = normalizeInputs( xtrain );
+		xvalid = normalizeInputs( xvalid );
 		//TODO::zober minimum validacnej chyby, vyskusaj momentum
 		List<RealMatrix> weights = initWeights(layers);	
 		double E = 1;
@@ -465,13 +422,9 @@ public class MultiLayerNN {
 				bestWeights = Utils.deepCopyMat(weights);
 			}
 			
-			if ( ep % CHECK_FREQUENCY == 0){
-				//DEBUG::
-				//File f = new File("output", "generated_" + ep + ".png");
-				//plotData(f,xtrain, ypredicted);
-				
+			if ( ep % CHECK_FREQUENCY == 0){	
 				if (VERBOSE){
-					System.out.println("ep = " + ep + ", E = " + E );
+					System.out.println(trainTag + " : ep = " + ep + ", E = " + E );
 				}
 				
 				if (trainErrors != null ){
@@ -485,7 +438,9 @@ public class MultiLayerNN {
 			}
 			ep++;
 		}
-		
+		if (VERBOSE && ep < MAX_EPOCH_COUNT){
+			System.out.println(trainTag + " : Training has converged " );
+		}
 		return bestWeights;
 	}
 	
@@ -584,35 +539,52 @@ public class MultiLayerNN {
 	public static final int INPUT_SIZE = 2;
 	
 	///
-	private static void kfoldTest(File train, File test) throws Exception {
-		int[] layers = new int[]{10,9,8};
-		MultiLayerNN nn = new MultiLayerNN(train,test,INPUT_SIZE, layers);
+	private static double[] kfoldSingleTest(File train, File test) throws Exception {
+		int[] layers = new int[]{20,20};
+		MultiLayerNN nn = new MultiLayerNN(train,INPUT_SIZE, layers);
 		nn.MAX_EPOCH_COUNT = 1000;
 		System.out.println("Training with model : " + Arrays.toString(layers));
-		nn.train(1,1,8);
+		nn.train(FOLD_FACTOR);
 		
 	
-		double[] test_accuracy = nn.testData(test );
+		double[] test_accuracy = nn.testData(test);
 		double[] train_accuracy = nn.testData(train );
 		
-		
-		for (int i = 1 ; i < test_accuracy.length; i++){
-			System.out.println("Partial test  accuracy = " + test_accuracy[i] );
-			System.out.println("Partial train accuracy = " + train_accuracy[i] );
-		}
 		System.out.println("Average test  accuracy = " + test_accuracy[0] );
 		System.out.println("Average train accuracy = " + train_accuracy[0] );
+		
+		return new double[]{test_accuracy[0], train_accuracy[0]};
 	}
 	
-	private static void overfitexample(File train, File test) throws Exception {
+	private static void batchKFoldTest(File train, File test, int count) throws Exception{
+		double trainAverage = 0;
+		double testAverage  = 0;
+		for (int i = 0 ; i < count; i++){
+			System.out.println("KFold test :" + i);	
+			double[] tmp = kfoldSingleTest(train, test); 
+			testAverage += tmp[0];
+			trainAverage += tmp[1];
+		}
+		
+		trainAverage /= count;
+		testAverage  /= count;
+		System.out.println("Batch test testAverage = " + testAverage);
+		System.out.println("Batch test trainAverage = " + trainAverage);
+	}
+	
+	private static void findBestModel(File train, File test) throws Exception {
 		List<RealVector> trainErrors = new ArrayList<RealVector>(); 
 		List<RealVector> testErrors = new ArrayList<RealVector>();
-		for (int i = 5; i < 200; i+=10){
-			System.out.println("Training model with " + i+ " hidden neuronos");
-			MultiLayerNN nn = new MultiLayerNN(train,test,INPUT_SIZE, new int[]{i});
-			nn.MAX_EPOCH_COUNT = 500;
 		
-			nn.train(4,4,10);
+		double bestCV = -1;
+		int bestCVIndex = 0;
+		double bestTrainAccuracy = 0, bestTestAccuracy = 0;
+		for (int i = 20; i < 200; i+=2){
+			System.out.println("Training model with " + i+ " hidden neurons");
+			MultiLayerNN nn = new MultiLayerNN(train,INPUT_SIZE, new int[]{i});
+			nn.MAX_EPOCH_COUNT = 10000;
+		
+			double cv = nn.train(FOLD_FACTOR);
 			
 			double[] test_accuracy = nn.testData(test );
 			double[] train_accuracy = nn.testData(train );
@@ -620,9 +592,23 @@ public class MultiLayerNN {
 			trainErrors.add( new ArrayRealVector(new double[]{i, 1-train_accuracy[0]  } ) );
 			testErrors.add ( new ArrayRealVector(new double[]{i, 1-test_accuracy[0] } ) );
 			
+			if (cv > bestCV){
+				bestCV = cv;
+				bestCVIndex = i;
+				bestTestAccuracy = test_accuracy[0];
+				bestTrainAccuracy = train_accuracy[0];
+			}
+			System.out.println("--------------------------");
+			System.out.println("M("+i+").CV = " + cv);
+			System.out.println("M("+i+").trainAccuracy = " + train_accuracy[0]);
+			System.out.println("M("+i+").testAccuracy  = " + test_accuracy[0] );
 		}
 		
 		plotErrorCurve(new File(OUT_PLOT_DIR, "overfit.png"), trainErrors, testErrors, "number of neurons", "error");
+		System.out.println("--------------------------");
+		System.out.println("Best : M("+bestCVIndex+").CV = " + bestCV);
+		System.out.println("Best : M("+bestCVIndex+").trainAccuracy = " + bestTrainAccuracy);
+		System.out.println("Best : M("+bestCVIndex+").testAccuracy  = " + bestTestAccuracy );
 	}
 	
 	public static void main(String[] args){
@@ -632,8 +618,9 @@ public class MultiLayerNN {
 		File test = new File ("src/main/resources/2d.tst.dat");
 		
 		try {
-			kfoldTest(train, test);
-			//overfitexample(train, test);
+			batchKFoldTest(train, test, 2);
+			//findBestModel(train, test);
+			//kfoldSingleTest(train, test)
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
