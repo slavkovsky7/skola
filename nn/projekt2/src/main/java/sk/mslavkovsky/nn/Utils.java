@@ -61,4 +61,15 @@ public class Utils {
 		}
 		return result / l.size();
 	}
+	
+	public static String toString(List<Double> d){
+		String result = "";
+		for (int i = 0 ; i < d.size();i++){
+			if ( i > 0 ){
+				result += ", ";
+			}
+			result =result + d.get(i).floatValue();
+		}
+		return result;
+	}
 }

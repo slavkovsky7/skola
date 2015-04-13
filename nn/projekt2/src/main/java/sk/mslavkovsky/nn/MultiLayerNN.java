@@ -5,12 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
@@ -21,12 +21,11 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.w3c.dom.ls.LSInput;
 
 public class MultiLayerNN {
 	
 	
-	private static class InputDataContainer
+	public static class InputDataContainer
 	{
 		public List<RealVector> x;
 		public List<RealVector> y;
@@ -67,9 +66,9 @@ public class MultiLayerNN {
 	private HashMap<String, RealVector> classToVector = new HashMap<String, RealVector>();
 	private HashMap<RealVector,String > vectorToClass = new HashMap<RealVector, String>();
 	
-	public static final File GENERATED_DIR = new File("generated");
-	public static final File SCRIPT_FILE= new File(GENERATED_DIR,"generated-plot-code.gnuplot");
-	public static final File OUT_PLOT_DIR = new File(GENERATED_DIR,"output" );
+	public int[] getLayers(){
+		return layers;
+	}
 	
 	public MultiLayerNN(File f, int inputSize, int[] hiddenLayers) throws FileNotFoundException{
 		data = load(f, inputSize);
@@ -89,7 +88,7 @@ public class MultiLayerNN {
 	}
 
 	
-	private InputDataContainer load(File f, int inputSize) throws FileNotFoundException{
+	public InputDataContainer load(File f, int inputSize) throws FileNotFoundException{
 		Scanner scanner = new Scanner(f);
 		ArrayList<double[]> xPremim = new ArrayList<double[]>();
 		ArrayList<String>	yPrelim = new ArrayList<String>();
@@ -183,9 +182,19 @@ public class MultiLayerNN {
 	}
 	
 	private RealVector classify( RealVector v ){
-		RealVector result = v.copy();
+		RealVector result = new ArrayRealVector(v.getDimension());
+		int maxIndex = -1;
+		double max = 0;
 		for (int i = 0 ; i < v.getDimension(); i++){
-			result.setEntry(i, result.getEntry(i) > TRESHOLD ? 1 : 0);
+			if ( v.getEntry(i) > max  ){
+				maxIndex = i;
+				max = v.getEntry(i);
+			}
+		}
+		if (max > TRESHOLD ){
+			result.setEntry(maxIndex, 1);
+		}else{
+			result.setEntry(maxIndex, 0);
 		}
 		return result;
 	}
@@ -279,6 +288,9 @@ public class MultiLayerNN {
 				System.out.println(trainTag + " : Training start");
 				weights = train(subtrainx, subtrainy, subvalidx, subvalidy, trainErrors, validErrors, trainTag);
 				System.out.println(trainTag + " : Training done");
+				if (VERBOSE){
+					plotErrorCurve(new File(Settings.OUT_PLOT_DIR, "curve_"+trainTag+".png"), trainErrors, validErrors);
+				}
 			}catch(Exception ex){
 				throw new RuntimeException(ex);
 			}
@@ -286,12 +298,15 @@ public class MultiLayerNN {
 	}
 	
 	//Vracia pole hodnot, kde result[0] je priemer hodnot, dalej su pre jednotlive modely
-	
-	public double[] testData(File f) throws FileNotFoundException{
-		return testData( load(f, dimension) );
+	public double[] testData(File f) throws IOException, InterruptedException{
+		return testData( load(f, dimension),false );
 	}
 	
-	public double[] testData(InputDataContainer d){
+	public double[] testData(File f, boolean plot) throws IOException, InterruptedException{
+		return testData( load(f, dimension),plot );
+	}
+	
+	public double[] testData(InputDataContainer d, boolean plot) throws IOException, InterruptedException{
 		double[] result = new double[w.size() + 1];
 		
 		List<RealVector> xtest = Utils.deepCopy(d.x);
@@ -301,15 +316,22 @@ public class MultiLayerNN {
 		
 		double sum = 0;
 		for ( int i = 1; i < result.length; i++ ){
-			result[i] = validate( w.get(i-1), xtest, ytest);
+			List<RealMatrix> weigts = w.get(i-1);
+			result[i] = validate( weigts, xtest, ytest);
 			sum += result[i];
+			if (plot){
+				plotData(new File(Settings.OUT_PLOT_DIR, "actual_test_"+i+".png"),xtest,ytest);
+				Thread.sleep(100);
+				List<RealVector> predicted = predict(weigts, xtest);
+				plotData(new File(Settings.OUT_PLOT_DIR, "predicted_test_"+i+".png"),xtest,predicted);
+			}
 		}
 		result[0] = sum / w.size();
 		return result;
 	}
 	
 	
-	public double train(int kFactor) throws IOException, InterruptedException{
+	public double train(int kFactor, List<Double> validationAccuracies) throws IOException, InterruptedException{
 		List<RealVector> xtrain = Utils.deepCopy(data.x);
 		List<RealVector> ytrain = Utils.deepCopy(data.y);
 		
@@ -337,13 +359,10 @@ public class MultiLayerNN {
 			subValids.add( new InputDataContainer( subvalidx, subvalidy ) );
 			
 			if (VERBOSE){
-				plotData(new File(OUT_PLOT_DIR, "expected_train_"+i+".png"),subtrainx,subtrainy);
+				plotData(new File(Settings.OUT_PLOT_DIR, "expected_train_"+i+".png"),subtrainx,subtrainy);
 				Thread.sleep(100);
-				plotData(new File(OUT_PLOT_DIR, "expected_valid_"+i+".png"),subvalidx, subvalidy);
+				plotData(new File(Settings.OUT_PLOT_DIR, "expected_valid_"+i+".png"),subvalidx, subvalidy);
 			}
-			
-
-		
 			
 			TrainThread t = new TrainThread(subtrainx, subtrainy, subvalidx, subvalidy, ("kfold-"+i) );
 			service.execute(t);
@@ -359,11 +378,9 @@ public class MultiLayerNN {
 			//todo:: kokotina tu je nejaka
 			TrainThread t = trainTaskAll.get(i);	
 			double accuracy = validate(t.weights, subValids.get(i).x, subValids.get(i).y);
+			validationAccuracies.add(accuracy);
 			CV += accuracy;
 			w.add(t.weights);
-			if (VERBOSE){
-				plotErrorCurve(new File(OUT_PLOT_DIR, "curve_"+i+".png"), t.trainErrors, t.validErrors);
-			}
 		}		
 		return CV / kFactor;
 	}
@@ -396,7 +413,7 @@ public class MultiLayerNN {
 				
 				ypredicted.add(classify(y));
 				
-				//if ( e > 0){
+				if ( e > 0){
 					RealVector[] delta = new RealVector[weights.size()]; 
 					for ( int l = weights.size() - 1 ; l >= 0; l-- ){
 						RealVector sig = h.get(l+1);
@@ -416,7 +433,7 @@ public class MultiLayerNN {
 						RealMatrix dwi  = delta[l].mapMultiply(alpha).outerProduct( h.get(l).append(-1));
 						weights.set(l, weights.get(l).add(dwi));
 					}
-				//}
+				}
 			}
 
 			double accuracy  = validate(weights,xvalid,yvalid);
@@ -427,7 +444,7 @@ public class MultiLayerNN {
 				bestWeights = Utils.deepCopyMat(weights);
 			}
 			
-			if ( ep % CHECK_FREQUENCY == 0){	
+			if ( ep % CHECK_FREQUENCY == 0 || E <= EPSILON){	
 				if (VERBOSE){
 					System.out.println(trainTag + " : ep = " + ep + ", E = " + E );
 				}
@@ -446,7 +463,7 @@ public class MultiLayerNN {
 		if (VERBOSE && ep < MAX_EPOCH_COUNT){
 			System.out.println(trainTag + " : Training has converged " );
 		}
-		return weights;
+		return bestWeights;
 	}
 	
 	private void plotData(File outPut, List<RealVector> xtrain , List<RealVector> ytrain ) throws IOException, InterruptedException{
@@ -455,7 +472,7 @@ public class MultiLayerNN {
 			String fName = "generated-data_" + vectorToClass.get(ytrain.get(i))+ ".dat";
 			PrintWriter pw = pws.get(fName);
 			if ( pw == null){
-				pw = new PrintWriter(new File(GENERATED_DIR, fName).getAbsoluteFile() );
+				pw = new PrintWriter(new File(Settings.GENERATED_DIR, fName).getAbsoluteFile() );
 				pws.put(fName, pw);
 			}
 			
@@ -466,7 +483,7 @@ public class MultiLayerNN {
 			pw.close();
 		}
 		
-		PrintWriter pw = new PrintWriter(SCRIPT_FILE);
+		PrintWriter pw = new PrintWriter(Settings.SCRIPT_FILE);
 		
 		pw.println( "set terminal png size 1024,768");
 		pw.println( "set output '"+outPut.getAbsoluteFile()+"'");
@@ -474,6 +491,10 @@ public class MultiLayerNN {
 		pw.println("set xlabel \"X1 axis\" ");
 		pw.println("set ylabel \"X2 axis\" ");
 		pw.println("set zlabel \"X3 axis\" "); 
+		
+		pw.println("set xrange [-5:5] ");
+		pw.println("set yrange [-50:50] "); 
+		
 		
 		pw.println("set title \"3D surface from a function\"");
 
@@ -487,12 +508,12 @@ public class MultiLayerNN {
 			if (i > 1){
 				plotCmd += ", ";
 			}
-			plotCmd += "\""+new File(GENERATED_DIR, fname).getAbsoluteFile() +"\" with points ls " + i;
+			plotCmd += "\""+new File(Settings.GENERATED_DIR, fname).getAbsoluteFile() +"\" with points ls " + i;
 			i++;
 		}
 		pw.println(plotCmd);
 		pw.close();
-		Utils.plot(SCRIPT_FILE);
+		Utils.plot(Settings.SCRIPT_FILE);
 		
 	}
 	
@@ -500,22 +521,22 @@ public class MultiLayerNN {
 		plotErrorCurve(outPut, trainErrors, validErrors, "epoch" , "error");
 	}
 	
-	public static void plotErrorCurve( File outPut, List<RealVector> x , List<RealVector> y, String xname, String yname) throws IOException, InterruptedException{
-		File trainErrorsFile = new File(GENERATED_DIR, "generated-train-errors.dat");
-		File validErrorsFile = new File(GENERATED_DIR, "generated-valid-errors.dat");
+	public static void plotErrorCurve( File outPut, List<RealVector> trainErrors , List<RealVector> validErrors, String xname, String yname) throws IOException, InterruptedException{
+		File trainErrorsFile = new File(Settings.GENERATED_DIR, "generated-train-errors.dat");
+		File validErrorsFile = new File(Settings.GENERATED_DIR, "generated-valid-errors.dat");
 		
 		PrintWriter pwT = new PrintWriter(trainErrorsFile);
 		PrintWriter pwV = new PrintWriter(validErrorsFile);
-		for (int i = 0; i < x.size(); i++){
-			RealVector vT = x.get(i);
-			RealVector vV = y.get(i);
+		for (int i = 0; i < trainErrors.size(); i++){
+			RealVector vT = trainErrors.get(i);
+			RealVector vV = validErrors.get(i);
 			pwT.println( vT.getEntry(0) + " " + vT.getEntry(1) );
 			pwV.println( vV.getEntry(0) + " " + vV.getEntry(1) );
 		}
 		pwT.close();
 		pwV.close();
 		
-		PrintWriter pw = new PrintWriter(SCRIPT_FILE);
+		PrintWriter pw = new PrintWriter(Settings.SCRIPT_FILE);
 		pw.println( "set terminal png size 1024,768");
 		pw.println( "set output '"+outPut+"'");
 		pw.println( "set yrange [0:1]");
@@ -525,116 +546,76 @@ public class MultiLayerNN {
 		pw.println("plot \""+trainErrorsFile.getAbsoluteFile()+"\" with lines ls 1, \""+validErrorsFile.getAbsolutePath()+"\" with lines ls 2");	
 		pw.close();	
 		
-		Utils.plot(SCRIPT_FILE);
+		Utils.plot(Settings.SCRIPT_FILE);
+	}
+	
+	private List<RealVector> predict(List<RealMatrix> weights, List<RealVector> xxdata){
+		List<RealVector> result = new ArrayList<RealVector>();
+		for (int i = 0; i < xxdata.size(); i++){
+			List<RealVector> fw = forwardPass(xxdata.get(i), weights);
+			RealVector predicted = fw.get(fw.size() - 1  );
+			result.add( classify(predicted) );;
+		}
+		return result;
 	}
 	
 	private double validate(List<RealMatrix> weights, List<RealVector> xxdata, List<RealVector> yydata){
 		double okCount = 0;
+		List<RealVector> predicted = predict(weights,xxdata);
 		for (int i = 0; i < xxdata.size(); i++){
-			List<RealVector> fw = forwardPass(xxdata.get(i), weights );
-			RealVector predicted = fw.get(fw.size() - 1  );
-			if (classify(predicted).equals( yydata.get(i) ) ){
+			if (predicted.get(i).equals( yydata.get(i) ) ){
 				okCount += 1;
 			}
 		}
 		return okCount / xxdata.size();
 	}
 	
-	/*******************************************/
-	public static final int FOLD_FACTOR = 8;
-	public static final int INPUT_SIZE = 2;
-	
-	///
-	private static double[] kfoldSingleTest(File train, File test) throws Exception {
-		int[] layers = new int[]{20,20};
-		MultiLayerNN nn = new MultiLayerNN(train,INPUT_SIZE, layers);
-		nn.MAX_EPOCH_COUNT = 30000;
-		System.out.println("Training with model : " + Arrays.toString(layers));
-		nn.train(8);
-		
-	
-		double[] test_accuracy = nn.testData(test);
-		double[] train_accuracy = nn.testData(train );
-		
-		System.out.println("Average test  accuracy = " + test_accuracy[0] );
-		System.out.println("Average train accuracy = " + train_accuracy[0] );
-		
-		return new double[]{test_accuracy[0], train_accuracy[0]};
-	}
-	
-	private static void batchKFoldTest(File train, File test, int count) throws Exception{
-		double trainAverage = 0;
-		double testAverage  = 0;
-		for (int i = 0 ; i < count; i++){
-			System.out.println("KFold test :" + i);	
-			double[] tmp = kfoldSingleTest(train, test); 
-			testAverage += tmp[0];
-			trainAverage += tmp[1];
-		}
-		
-		trainAverage /= count;
-		testAverage  /= count;
-		System.out.println("Batch test testAverage = " + testAverage);
-		System.out.println("Batch test trainAverage = " + trainAverage);
-	}
-	
-	private static void findBestModel(File train, File test) throws Exception {
-
-		double bestCV = -1;
-		String bestCVIndex = "";
-		double bestTrainAccuracy = 0, bestTestAccuracy = 0;
-		for (int i = 15; i < 40; i+=2){
-			List<RealVector> trainErrors = new ArrayList<RealVector>(); 
-			List<RealVector> testErrors = new ArrayList<RealVector>();
-			for (int j = 15 ; j < 40; j++){
-				
-				int[] layers = new int[]{i,j};
-				String modelID = Arrays.toString(layers);
-				System.out.println("Training model with " +modelID+ " hidden neurons");
-				MultiLayerNN nn = new MultiLayerNN(train,INPUT_SIZE, layers );
-				nn.MAX_EPOCH_COUNT = 100;
-			
-				double cv = nn.train(FOLD_FACTOR);
-				double[] test_accuracy = nn.testData(test );
-				double[] train_accuracy = nn.testData(train );
-				
-				trainErrors.add( new ArrayRealVector(new double[]{j, 1-train_accuracy[0]  } ) );
-				testErrors.add ( new ArrayRealVector(new double[]{j, 1-test_accuracy[0] } ) );
-				
-
-				if (cv > bestCV){
-					bestCV = cv;
-					bestCVIndex = modelID;
-					bestTestAccuracy = test_accuracy[0];
-					bestTrainAccuracy = train_accuracy[0];
-				}
-				System.out.println("--------------------------");
-				System.out.println("M("+modelID+").CV = " + cv);
-				System.out.println("M("+modelID+").trainAccuracy = " + train_accuracy[0]);
-				System.out.println("M("+modelID+").testAccuracy  = " + test_accuracy[0] );
+	public List<RealMatrix> getBestWeights(List<RealVector> xxdata, List<RealVector> yydata){
+		int bestIndex = 0;
+		double best = -1;
+		for (int i = 0 ; i < w.size(); i++){
+			double a = validate(w.get(i), xxdata, yydata); 
+			if ( a > best){
+				best = a;
+				bestIndex = i;
 			}
-			plotErrorCurve(new File(OUT_PLOT_DIR, "overfit_"+i+".png"), trainErrors, testErrors, "number of neurons", "error");
 		}
-		
-
-		System.out.println("--------------------------");
-		System.out.println("Best : M("+bestCVIndex+").CV = " + bestCV);
-		System.out.println("Best : M("+bestCVIndex+").trainAccuracy = " + bestTrainAccuracy);
-		System.out.println("Best : M("+bestCVIndex+").testAccuracy  = " + bestTestAccuracy );
+		return w.get(bestIndex);
 	}
 	
-	public static void main(String[] args){
-		//URL url = Thread.currentThread().getContextClassLoader().getResource("2d.trn.dat");
+	public RealMatrix getBestConfusionMatrix(List<RealVector> xxdata, List<RealVector> yydata){
+		xxdata = normalizeInputs(xxdata, data.x);
 		
-		File train = new File ("src/main/resources/2d.trn.dat");
-		File test = new File ("src/main/resources/2d.tst.dat");
+		List<RealMatrix> weights = getBestWeights(xxdata, yydata);
+		RealMatrix result = new Array2DRowRealMatrix(classToVector.size(), classToVector.size() + 1);
 		
-		try {
-			//batchKFoldTest(train, test, 10);
-			//findBestModel(train, test);
-			kfoldSingleTest(train, test);
-		} catch (Exception e) {
-			e.printStackTrace();
+		HashMap<String, Integer> classToIndex = new HashMap<String, Integer>();
+		Set<String> orderedClasses = new TreeSet<String>(classToVector.keySet());
+		int index = 0;
+		for (String cls : orderedClasses){
+			classToIndex.put(cls, index);
+			index++;
 		}
+		
+		
+		for (int i = 0; i < xxdata.size(); i++){
+			List<RealVector> fw = forwardPass(xxdata.get(i), weights );
+			RealVector predicted = classify(fw.get(fw.size() - 1  ));
+			RealVector actual =  yydata.get(i);
+			
+			int actualIndex = classToIndex.get( vectorToClass.get(actual) );
+			
+			
+			String predicetStr = vectorToClass.get(predicted);
+			int predictedIndex = 0;
+			if (predicetStr == null){
+				predictedIndex = classToIndex.size();
+			}else{
+				predictedIndex = classToIndex.get( predicetStr  );
+			}
+			double oldVal = result.getEntry(actualIndex, predictedIndex);
+			result.setEntry(actualIndex, predictedIndex, oldVal + 1);
+		}
+		return result;
 	}
 }
