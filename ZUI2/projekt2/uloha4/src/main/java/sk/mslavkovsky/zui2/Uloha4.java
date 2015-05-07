@@ -1,19 +1,15 @@
 package sk.mslavkovsky.zui2;
 
-import java.awt.AlphaComposite;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
-import org.apache.commons.math3.util.Precision;
+import java.util.TreeMap;
 
 public class Uloha4 {
 	
@@ -46,7 +42,7 @@ public class Uloha4 {
 		pw.close();
 	}
 	
-	public void plotEverything(String outPutStr, Map<String, double[]> datas) throws IOException, InterruptedException{
+	public void plotEverything(String outPutStr, Map<String, double[]> datas, boolean plotImg ) throws IOException, InterruptedException{
 		
 		for( Map.Entry<String, double[]> entry : datas.entrySet() ){
 			File f = new File(Settings.GENERATED_DIR, "generated-"+entry.getKey()+".dat"); 
@@ -55,9 +51,11 @@ public class Uloha4 {
 		
 	
 		PrintWriter pw = new PrintWriter(Settings.SCRIPT_FILE);
-		//File output = new File(Settings.OUT_PLOT_DIR, outPutStr);
-		//pw.println( "set terminal png size 1024,768");
-		//pw.println( "set output '"+output.getAbsoluteFile()+"'");
+		if ( plotImg ){
+			File output = new File(Settings.OUT_PLOT_DIR, outPutStr);
+			pw.println( "set terminal png size 1024,768");
+			pw.println( "set output '"+output.getAbsoluteFile()+"'");
+		}
 		pw.println("set xlabel \"X axis\" ");
 		pw.println("set ylabel \"Y axis\" ");
 		
@@ -102,7 +100,7 @@ public class Uloha4 {
 		double[] result = new double[d.length + predictCount];
 		result[0] = d[0];
 		for (int i = 1; i < d.length; i++){
-			result[i] = alpha*d[i] + (1 - alpha)*result[i-1];
+			result[i] = alpha*d[i-1] + (1 - alpha)*result[i-1];
 		}
 		
 		for (int i = d.length; i < d.length + predictCount ;i++){
@@ -213,12 +211,24 @@ public class Uloha4 {
 		return result;
 	}
 	
-	public void findBestModel(double[] y, boolean tripple){
+	public double[] findBestModel(double[] y, String levelStr ) throws Exception{
+		
+		
+		int level = -1;
+		if ( levelStr.equals("single") ){
+			level = 1;
+		}else if ( levelStr.equals("double") ) {
+			level = 2;
+		}else if ( levelStr.equals("tripple") ) {
+			level = 3;
+		}
+		
+		if ( level == -1 ){
+			throw new Exception("invalid level : " + levelStr);
+		}
 		
 		int PERIOD = 4;
 		int SPLIT_FACTOR = 4;
-		
-		
 		
 		double bestAlpha = 0;
 		double bestBeta = 0;
@@ -231,20 +241,26 @@ public class Uloha4 {
 		for (int i = 0; i < steps; i++){
 			for (int j = 0; j < steps; j++){
 				for (int k = 0; k < steps; k++){
-					double alpha = ( tripple ? i : j ) * delta; 
-					double beta  = ( tripple ? j : k ) * delta;
-					double gama  = ( tripple ? k : 0 ) * delta;
+					double alpha = k * delta; 
+					double beta  = j * delta;
+					double gama  = i * delta;
 					
 					double[][] splitted = Utils.splitArray( y, y.length - SPLIT_FACTOR );
 					
-					double[][] dexp = null;
-					if (tripple){
-						dexp = trippleExponentialSmoothing(splitted[0], PERIOD, alpha, beta, gama, SPLIT_FACTOR);//(y, alpha, beta, 0);
-					}else{
-						dexp = doubleExponentialSmoothing(splitted[0], alpha, beta, SPLIT_FACTOR);
+					double[] dexp = null;
+					switch(level){
+						case 1: 
+							dexp = singleExponentialSmoothing(splitted[0], alpha, SPLIT_FACTOR);
+							break;
+						case 2: 
+							dexp = doubleExponentialSmoothing(splitted[0], alpha, beta, SPLIT_FACTOR)[0];
+							break;
+						case 3:
+							dexp = trippleExponentialSmoothing(splitted[0], PERIOD, alpha, beta, gama, SPLIT_FACTOR)[0];
+							break;
 					}
 					
-					double[][] dexp_splitted = Utils.splitArray( dexp[0], dexp[0].length - SPLIT_FACTOR );
+					double[][] dexp_splitted = Utils.splitArray( dexp, dexp.length - SPLIT_FACTOR );
 					
 					double mse = meanSquareError(splitted[1], dexp_splitted[1] ) ;
 					if ( mse < minMSE  ){
@@ -253,22 +269,24 @@ public class Uloha4 {
 						bestBeta = beta;
 						bestGama = gama;
 					}
-					
-					//System.out.println("Model : alpha = " + alpha + ", beta = " + beta + ", MSE = " + mse);
+				}
+				
+				if (level < 2){
+					break;
 				}
 			}
 			
-			if (!tripple){
+			if ( level < 3){
 				break;
 			}
 		}
-		String str = "Best Model : alpha = " + bestAlpha + ", beta = " + bestBeta;
-		if (tripple){
-			str += ", gama = "+  bestGama; 
-		}
+		String str = "Best Model "+level+" : alpha = " + bestAlpha;
+		if (level == 2 ) { str += ", beta = " + bestBeta; }
+		if (level == 3) { str += ", gama = "+  bestGama; }
 		str += ", MSE = " + minMSE;
 		System.out.println(str);
 		
+		return new double[] { bestAlpha, bestBeta, bestGama};
 	}
 	
 	public static double meanSquareError(double[] y, double f[] ){
@@ -279,36 +297,50 @@ public class Uloha4 {
 		result /= y.length;
 		return result;
 	}
-	
-	
-	public static double[] findBestModel(){
-		//TODO::
-		return null;
-	}
-	
-	
+
 	public static void main(String[] args) throws IOException, InterruptedException{
 		try {
-			Uloha4 uloha = new Uloha4(new File("data3.txt"));
-			HashMap<String, double[]> dataMap = new HashMap<String, double[]>();
-		
 			
-			//double[] ma = uloha.movingAverage(uloha.data, 50);
-			//double[] exp1 = uloha.singleExponentialSmoothing(uloha.data, 0.3, 10);
-			//double[][] exp2 = uloha.doubleExponentialSmoothing(uloha.data, 0.1, 0.18, 50);
-			double[][] exp3 = uloha.trippleExponentialSmoothing(uloha.data, 4, 0.16, 0.31, 0.76, 50 );
-			uloha.findBestModel(uloha.data, true);
+			int forecast = Integer.parseInt( Utils.getOrDefault(args, "-f", "5") );;
+			int period = Integer.parseInt( Utils.getOrDefault(args, "-p", "4") );
+			boolean plotImg = Utils.contains(args, "-png" );
+			 
+			String path = Utils.getOrDefault(args, "-d", "data3.txt");
+		
+			Uloha4 uloha = new Uloha4(new File(path));
+			Map<String, double[]> dataMap = new TreeMap<String, double[]>();
+			
+			double[] modelSingle = uloha.findBestModel(uloha.data, "single");
+			double[] modelDouble  = uloha.findBestModel(uloha.data, "double");
+			double[] modelTripple = uloha.findBestModel(uloha.data, "tripple");
+	
+			double[] exp1 = uloha.singleExponentialSmoothing(uloha.data, modelSingle[0], forecast);
+			double[][] exp2 = uloha.doubleExponentialSmoothing(uloha.data, modelDouble[0], modelDouble[1], forecast);
+			double[][] exp3 = uloha.trippleExponentialSmoothing(uloha.data, period , modelTripple[0], modelTripple[1], modelTripple[2], forecast);
+			
 			
 			dataMap.put("original", uloha.data);
-			//dataMap.put("moving avg", ma );
-			//dataMap.put("e2_smoothed", exp2[0] );
-			//dataMap.put("e2_forecast", exp2[1] );
-			dataMap.put("e3_forecast", exp3[0] );
-			dataMap.put("e3_smoothed", exp3[1] );
+			dataMap.put("e1", exp1 );
+			dataMap.put("e2", exp2[0] );
+			dataMap.put("e3", exp3[0] );
+			uloha.plotEverything("output_forecast.png", dataMap, plotImg );
 			
+			dataMap.clear();
 			
-			uloha.plotEverything("output.png", dataMap );
-		} catch (FileNotFoundException e) {
+			double[][] exp1Splitted = Utils.splitArray(exp1, exp1.length- forecast);
+			double[][] exp2Splitted = Utils.splitArray(exp2[0], exp2[0].length - forecast);
+			double[][] exp3Splitted = Utils.splitArray(exp3[0], exp3[0].length - forecast);
+			
+			dataMap.put("original", uloha.data);
+			dataMap.put("e1", exp1Splitted[0] );
+			dataMap.put("e2", exp2[1] );
+			dataMap.put("e3", exp3[1] );
+			uloha.plotEverything("output_smoothed.png", dataMap, plotImg );
+			
+			System.out.println("Single  Smoothing forecast : " + Arrays.toString(exp1Splitted[1]) );
+			System.out.println("Double  Smoothing forecast : " + Arrays.toString(exp2Splitted[1]) );
+			System.out.println("Tripple Smoothing forecast : " + Arrays.toString(exp3Splitted[1]) );
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

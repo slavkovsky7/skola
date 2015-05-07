@@ -86,4 +86,30 @@ public class Utils {
 		result[1] = Arrays.copyOfRange(input, index, input.length);
 		return result;
 	}
+	
+	public static boolean contains(String[] args, String arg){
+		for (String a : args){
+			if (a.equals(arg)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static String getArgumentValue(String[] args, String arg){
+		for (int i = 0; i <  args.length; i++){
+			if (args[i].equals(arg) && i < args.length - 1 ){
+				return args[i+1];
+			}
+		}
+		return "";
+	}
+	
+	public static String getOrDefault(String[] args, String arg, String def){
+		String argVal = getArgumentValue(args, arg);
+		if (!argVal.isEmpty()){
+			return argVal;
+		}
+		return def;
+	}
 }
