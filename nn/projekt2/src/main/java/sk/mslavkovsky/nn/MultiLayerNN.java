@@ -58,7 +58,7 @@ public class MultiLayerNN {
 	private int[] layers;
 	public int MAX_EPOCH_COUNT = 5000;
 	public double alpha = 0.1;
-	public double TRESHOLD = 0.5d;
+	public double TRESHOLD = 0d;
 	public int CHECK_FREQUENCY = 100;
 	public boolean VERBOSE = true;
 	public double EPSILON = 0.0001;
@@ -163,6 +163,26 @@ public class MultiLayerNN {
 		return 1d / ( 1d + Math.exp( -x ) );
 	}
 		
+	private static RealVector activationFunction(RealVector net){
+		return sigmoid(net);
+		//return tanh(net);
+	}
+
+	private RealVector derivative(RealVector sig){
+		RealVector der = hadamard(sig, sig.mapMultiply(-1).mapAdd(1) );				
+		//RealVector der = hadamard(sig, sig).mapMultiply(-1).mapAdd(1);
+		return der;
+	}
+	
+	
+	private static RealVector tanh(RealVector net){
+		RealVector result = new ArrayRealVector(net.getDimension());
+		for (int i = 0; i < net.getDimension(); i++){
+			result.setEntry(i, Math.tanh(net.getEntry(i)));
+		}
+		return result;
+	}
+	
 	private static RealVector sigmoid(RealVector net){
 		RealVector result = new ArrayRealVector(net.getDimension());
 		for (int i = 0; i < net.getDimension(); i++){
@@ -176,15 +196,15 @@ public class MultiLayerNN {
 		h.add(x);
 		for ( int i = 1 ; i < w.size() + 1; i++ ){
 			RealVector net = w.get(i - 1 ).operate( h.get(i-1).append(-1) );
-			h.add(sigmoid(net));
+			h.add(activationFunction(net));
 		}
 		return h;
 	}
 	
 	private RealVector classify( RealVector v ){
 		RealVector result = new ArrayRealVector(v.getDimension());
-		int maxIndex = -1;
-		double max = 0;
+		int maxIndex = -10;
+		double max = -100;
 		for (int i = 0 ; i < v.getDimension(); i++){
 			if ( v.getEntry(i) > max  ){
 				maxIndex = i;
@@ -417,7 +437,7 @@ public class MultiLayerNN {
 					RealVector[] delta = new RealVector[weights.size()]; 
 					for ( int l = weights.size() - 1 ; l >= 0; l-- ){
 						RealVector sig = h.get(l+1);
-						RealVector der = hadamard(sig, sig.mapMultiply(-1).mapAdd(1) );				
+						RealVector der = derivative(sig);				
 						if (l == weights.size() - 1){
 							delta[l] = hadamard(target.subtract(y), der );
 						}else{			
@@ -426,7 +446,6 @@ public class MultiLayerNN {
 							RealVector tmp =  w_unbias.transpose().operate( delta[l+1] );
 							delta[l] = hadamard(tmp, der);
 						}
-						
 					}
 					
 					for ( int l = weights.size() - 1 ; l >= 0; l-- ){
