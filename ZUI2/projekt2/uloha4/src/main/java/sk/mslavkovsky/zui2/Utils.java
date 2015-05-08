@@ -2,6 +2,8 @@ package sk.mslavkovsky.zui2;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -111,5 +113,20 @@ public class Utils {
 			return argVal;
 		}
 		return def;
+	}
+	
+	public static double[] round(double[] input, int places){
+		double[] result = new double[input.length];
+		for (int i = 0 ; i < input.length; i++){
+			result[i] = roundNum( input[i], places );
+		}
+		return result;
+	}
+	
+	public static double roundNum(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
 	}
 }

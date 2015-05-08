@@ -49,12 +49,14 @@ public class Uloha4 {
 			generateGnuDataFile(f,entry.getValue());
 		}
 		
-	
+		
 		PrintWriter pw = new PrintWriter(Settings.SCRIPT_FILE);
 		if ( plotImg ){
-			File output = new File(Settings.OUT_PLOT_DIR, outPutStr);
+			File output = new File(Settings.OUT_PLOT_DIR, outPutStr + ".png" );
 			pw.println( "set terminal png size 1024,768");
 			pw.println( "set output '"+output.getAbsoluteFile()+"'");
+		}else{
+			pw.println("set term wxt title '"+outPutStr+"'");
 		}
 		pw.println("set xlabel \"X axis\" ");
 		pw.println("set ylabel \"Y axis\" ");
@@ -146,7 +148,7 @@ public class Uloha4 {
 	}
 	
 	//TODO::Vratit S aj ForeCast
-	public double[][] trippleExponentialSmoothing(double[] d , int period,  double alpha, double beta, double gama, int predictCount){
+	public double[][] trippleExponentialSmoothing(double[] d , int period,  double alpha, double beta, double gama, int predictCount, boolean additive){
 		//TODO::
 		double[] b = new double[d.length];
 		for (int i = 0; i < period; i++ ){
@@ -176,12 +178,19 @@ public class Uloha4 {
 		s[0] = d[0];
 		for (int t = 1; t < d.length; t++){
 			boolean overPeriod = t - period >= 0;
-			double ctl_1 =  overPeriod ? it[t-period] : 1; 
-			s[t] = (alpha*d[t])/ctl_1 + (1-alpha)*(s[t-1] + b[t-1]);
-			b[t] = beta*( s[t] - s[t-1] ) + (1-beta)*b[t-1];
-			if (overPeriod){
-				it[t] = gama*(d[t] / s[t]) + (1-gama)*it[t-1];
+			double ctl_1 =  overPeriod ? it[t-period] : 1;
+			if (additive){
+				s[t] = alpha*(d[t] - ctl_1) + (1-alpha)*(s[t-1] + b[t-1]);
+				if (overPeriod){
+					it[t] = gama*(d[t] - it[t]) + (1-gama)*ctl_1;
+				}
+			}else{
+				s[t] = (alpha*d[t])/ctl_1 + (1-alpha)*(s[t-1] + b[t-1]);
+				if (overPeriod){
+					it[t] = gama*(d[t] / s[t]) + (1-gama)*it[t-1];
+				}
 			}
+			b[t] = beta*( s[t] - s[t-1] ) + (1-beta)*b[t-1];
 		}
 		
 		
@@ -199,7 +208,11 @@ public class Uloha4 {
 				int tt = Math.min(d.length-1, t);
 				int m = t + 1 - tt;
 				int index = (tt - period + m - 1 ) % period;
-				f[t] = ( s[tt] + m*b[tt] ) *  it[ index ] ;
+				if (additive){
+					f[t] = s[tt] + m*b[tt] + it[index];
+				}else{
+					f[t] = ( s[tt] + m*b[tt] ) *  it[ index ] ;
+				}
 			}else{
 				f[t] = d[t];
 			}
@@ -211,7 +224,7 @@ public class Uloha4 {
 		return result;
 	}
 	
-	public double[] findBestModel(double[] y, String levelStr ) throws Exception{
+	public double[] findBestModel(double[] y, String levelStr, boolean additive ) throws Exception{
 		
 		
 		int level = -1;
@@ -256,7 +269,7 @@ public class Uloha4 {
 							dexp = doubleExponentialSmoothing(splitted[0], alpha, beta, SPLIT_FACTOR)[0];
 							break;
 						case 3:
-							dexp = trippleExponentialSmoothing(splitted[0], PERIOD, alpha, beta, gama, SPLIT_FACTOR)[0];
+							dexp = trippleExponentialSmoothing(splitted[0], PERIOD, alpha, beta, gama, SPLIT_FACTOR, additive)[0];
 							break;
 					}
 					
@@ -281,8 +294,8 @@ public class Uloha4 {
 			}
 		}
 		String str = "Best Model "+level+" : alpha = " + bestAlpha;
-		if (level == 2 ) { str += ", beta = " + bestBeta; }
-		if (level == 3) { str += ", gama = "+  bestGama; }
+		if (level >= 2 ) { str += ", beta = " + bestBeta; }
+		if (level >= 3) { str += ", gama = "+  bestGama; }
 		str += ", MSE = " + minMSE;
 		System.out.println(str);
 		
@@ -301,33 +314,53 @@ public class Uloha4 {
 	public static void main(String[] args) throws IOException, InterruptedException{
 		try {
 			
-			int forecast = Integer.parseInt( Utils.getOrDefault(args, "-f", "5") );;
+			boolean help = Utils.contains(args, "-help") || Utils.contains(args, "--help") || Utils.contains(args, "-h");;
+			if (help){
+				System.out.println("Usage: ");
+				System.out.println("       -png : Ulozi GNUPLOT vystup do obrazka v generated/output");
+				System.out.println("       -d   : cesta k suboru s datami");
+				System.out.println("       -p   : perioda pre tripple smooting");
+				System.out.println("       -f   : pocet predpovedanych krokov");
+				System.out.println("       -c   : pocet odrezanych riadkov od konca");
+				//System.out.println("       -a   : ak chceme additivny model, inak bude multiplikativny");
+				return;
+			}
+			int forecast = Integer.parseInt( Utils.getOrDefault(args, "-f", "2") );;
 			int period = Integer.parseInt( Utils.getOrDefault(args, "-p", "4") );
 			boolean plotImg = Utils.contains(args, "-png" );
-			 
+			int cut = Integer.parseInt( Utils.getOrDefault(args, "-c", "2") );
+			boolean additive = false;//Utils.contains(args, "-a" );
+			
+			if ( cut < 0){throw new Exception("-c musi byt > 0");}
+			if ( forecast < 0){throw new Exception("-f musi byt > 0");}
+			
 			String path = Utils.getOrDefault(args, "-d", "data3.txt");
 		
 			Uloha4 uloha = new Uloha4(new File(path));
 			Map<String, double[]> dataMap = new TreeMap<String, double[]>();
 			
-			double[] modelSingle = uloha.findBestModel(uloha.data, "single");
-			double[] modelDouble  = uloha.findBestModel(uloha.data, "double");
-			double[] modelTripple = uloha.findBestModel(uloha.data, "tripple");
-	
-			double[] exp1 = uloha.singleExponentialSmoothing(uloha.data, modelSingle[0], forecast);
-			double[][] exp2 = uloha.doubleExponentialSmoothing(uloha.data, modelDouble[0], modelDouble[1], forecast);
-			double[][] exp3 = uloha.trippleExponentialSmoothing(uloha.data, period , modelTripple[0], modelTripple[1], modelTripple[2], forecast);
 			
+			double[] modelSingle = uloha.findBestModel(uloha.data, "single", false);
+			double[] modelDouble  = uloha.findBestModel(uloha.data, "double", false);
+			double[] modelTripple = uloha.findBestModel(uloha.data, "tripple", additive);
+	
+			double[][] data = Utils.splitArray(uloha.data, uloha.data.length - cut );
+			double[] trainData = data[0]; 
+			double[] originalData = data[1];
+			
+			double[] exp1 = uloha.singleExponentialSmoothing(trainData, modelSingle[0], forecast);
+			double[][] exp2 = uloha.doubleExponentialSmoothing(trainData, modelDouble[0], modelDouble[1], forecast);
+			double[][] exp3 = uloha.trippleExponentialSmoothing(trainData, period , modelTripple[0], modelTripple[1], modelTripple[2], forecast, additive);
 			
 			dataMap.put("original", uloha.data);
 			dataMap.put("e1", exp1 );
 			dataMap.put("e2", exp2[0] );
 			dataMap.put("e3", exp3[0] );
-			uloha.plotEverything("output_forecast.png", dataMap, plotImg );
+			uloha.plotEverything("output_forecast", dataMap, plotImg );
 			
 			dataMap.clear();
 			
-			double[][] exp1Splitted = Utils.splitArray(exp1, exp1.length- forecast);
+			double[][] exp1Splitted = Utils.splitArray(exp1, exp1.length - forecast);
 			double[][] exp2Splitted = Utils.splitArray(exp2[0], exp2[0].length - forecast);
 			double[][] exp3Splitted = Utils.splitArray(exp3[0], exp3[0].length - forecast);
 			
@@ -335,11 +368,13 @@ public class Uloha4 {
 			dataMap.put("e1", exp1Splitted[0] );
 			dataMap.put("e2", exp2[1] );
 			dataMap.put("e3", exp3[1] );
-			uloha.plotEverything("output_smoothed.png", dataMap, plotImg );
+			uloha.plotEverything("output_smoothed", dataMap, plotImg );
 			
-			System.out.println("Single  Smoothing forecast : " + Arrays.toString(exp1Splitted[1]) );
-			System.out.println("Double  Smoothing forecast : " + Arrays.toString(exp2Splitted[1]) );
-			System.out.println("Tripple Smoothing forecast : " + Arrays.toString(exp3Splitted[1]) );
+			System.out.println("Original data : " +  Arrays.toString(originalData) );
+			int places = 2;
+			System.out.println("Single  Smoothing forecast : " + Arrays.toString(Utils.round(exp1Splitted[1], places ) ) );
+			System.out.println("Double  Smoothing forecast : " + Arrays.toString(Utils.round(exp2Splitted[1], places ) ) );
+			System.out.println("Tripple Smoothing forecast : " + Arrays.toString(Utils.round(exp3Splitted[1], places ) ) );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
