@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Projekt3</name>
+  <groupId>com.mslavkovsky.zui2</groupId>
+  <artifactId>Uloha2</artifactId>
+  <version>1.0.0</version>
+    
+  <dependencies>
+    <dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-math3</artifactId>
+	    <version>3.2</version>
+    </dependency>
+  </dependencies>
+    
+
+  <build>
+    <plugins>
+      <!-- any other plugins -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <repositories>
+        <repository>
+            <id>java.net-Public</id>
+            <name>Maven Java Net Snapshots and Releases</name>
+            <url>https://maven.java.net/content/groups/public/</url>
+        </repository>
+	<repository>
+            <id>apache.releases</id>
+            <name>Apache commons releases</name>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
+        </repository>
+  </repositories>
+</project>

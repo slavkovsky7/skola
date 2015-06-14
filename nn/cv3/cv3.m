@@ -1,5 +1,7 @@
 load_images;
 
+size(X(:,1))
+
 display_image(X,r,c);
 
 X1 = X(:,[1 2 3 4 5 6]);
@@ -23,6 +25,8 @@ W = gen_inv(W, X(:,7) );
 W = gen_inv(W, X(:,8) );
 W = gen_inv(W, X(:,9) );
 
+
+i = 10
 
 R = W*C;
 

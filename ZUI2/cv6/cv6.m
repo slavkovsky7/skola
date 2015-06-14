@@ -59,5 +59,6 @@ figure;
 
 
 hold all;
+plot(data);
 plot(c);
 %plot(c/c(:,1));

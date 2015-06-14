@@ -12,6 +12,7 @@ w = rand(1,n_input); % <- doplnit
 alpha = 0.1; % <- doplnit
 
 E = 1;
+ep=0
 while (E > 0.1)
    %2. nastav celkovu chybu epochy na 0
    E = 0;
@@ -39,11 +40,13 @@ while (E > 0.1)
        % <- doplnit
 
    end 
-
+   ep++;
+   sleep(1)
    % vizualizacia
-   % figure;
-   % clf;
-   
+
+      figure;
+      plotdots(data,w);
+
 end
 
 

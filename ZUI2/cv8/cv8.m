@@ -1,4 +1,4 @@
-
+#!/usr/bin/octave
 % HMM Forward-backward algoritm
 clear all;
 
@@ -59,7 +59,7 @@ pi = [0.5, 0.5];
 
 % O=Given observation sequence labelled in numerics
 % 1=True, 2=False
-o = [1;2;1;1;2];
+o = [1;2;];
 
 % Output
 % P=probability of the last state given a sequence of observations
