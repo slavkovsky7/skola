@@ -1,0 +1,76 @@
+addpath('/home/martin/workspace/skola/digi/inst')
+addpath('/home/martin/workspace/skola/digi/inst/private')
+addpath('/home/martin/workspace/skola/digi/control')
+
+
+function plotall(f)
+	figure;
+	plot(f)
+	figure;
+	freqz(f);
+	figure;
+	impz(f)
+end
+
+
+% dvojka 
+f1 = fir1(23, [4000/10000, 8000/10000], 'bandpass');
+plotall(f1);
+
+% trojka
+
+f2 = fir1(23, [4000/10000, 8000/10000], 'blackman');
+%plotall(f2);
+
+[h1,w1] = freqz(f1, [], 512, '', 20000);
+[h2,w2] = freqz(f2, [], 512, '', 20000);
+
+figure;
+subplot(2,1,1);
+plot(w1,20*log10(abs(h1)),'r');
+subplot(2,1,2);
+plot(w1,20*log10(abs(h1)),'b');
+
+
+
+
+figure;
+hold all;
+plot(w1, h1, 'b', w2 , h2,  'r');
+
+% stvorka
+f12 = fir2(24, [0, 6000/10000, 1], [0 1/2 0] );
+plotall(f12);
+
+% patka
+fr1 = firls(22, [2000/5000, 5000/5000], [0 1/2] );
+plotall(fr1);
+
+% 6-tka
+function ret = sinusoid(fs, f, phase, n)
+	ret=zeros(1,n);
+	for i=1 : n
+		ret(1,i) =  sin(phase + ((2*pi*f)/fs)*i);
+	end
+end
+
+sin1 = sinusoid(20000, 2600, 0, 100);
+sin2 = sinusoid(20000, 2900, 0, 100);
+
+sin3 = sin1 + sin2;
+sinf2 = fir1(99, [2600/10000], 'low');
+fil = filter(sinf2, 1 ,sin3);
+[h1, w1] = freqz(fil, 512, '', 10000);
+
+figure;
+hold all;
+subplot(5,1,1)
+plot(sin1, 'r')
+subplot(5,1,2)
+plot(sin2, 'g')
+subplot(5,1,3)
+plot(sin3, 'b')
+subplot(5,1,4)
+plot(fil)
+subplot(5,1,5)
+plot(w1,20*log10(abs(h1)),'b');

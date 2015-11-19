@@ -1,0 +1,73 @@
+addpath('/home/martin/workspace/skola/digi/inst')
+addpath('/home/martin/workspace/skola/digi/inst/private')
+%%%%%% Jednotka %%%%%%
+
+n=15;
+y=zeros(1,n);
+for k=1:n
+	t = cputime;
+	conv(1:2^k,1:2^k);
+	y(1,k)= cputime - t;
+end
+
+semilogy(y)
+% nie je n^2, je to exponencialny narast. 
+% Ak si to dame zobrazit len na plot tak jasne vidime ze to je exp 
+
+%%%%%% Dvojka %%%%%%
+
+figure;
+x1 = [0.3, -0.2, 0.4];
+x2 = [1.0, 0.9, 0.8];
+zplane(x1,x2);
+% stabilny je lebo x su v kruzku
+
+
+%%%%%% Trojka %%%%%%
+figure;
+nuly=[ exp(+i*pi/7), exp(-i*pi/7) ];
+poles=[0.8*exp(+i*pi/12), 0.8*exp(-i*pi/12)];
+
+x1 = poly(nuly)
+x2 = poly(poles)
+zplane(x1,x2)
+
+% je to stabilny filter
+
+
+%%%%%% Stvorka %%%%%%
+
+function v = sinusoid(fs, f, omega, n)
+  v = zeros(n, 1);
+  n=1:n;
+  v(n) = sin(omega + (2*pi*f/fs).*n);
+end
+
+sin1=sinusoid(16000,100,0,100);
+sin2=sinusoid(16000,2000,0,100);
+sinusoid = sin1 + sin2;
+h = [1,2,2,1]
+
+
+figure;
+subplot(2,2,1);
+plot(sinusoid);
+
+subplot(2,2,2);
+specgram(sinusoid,99);
+
+for i=1:10
+	sinusoid = filter(h,[1],sinusoid);
+end
+subplot(2,2,3);
+plot(sinusoid);
+
+subplot(2,2,4);
+specgram(sinusoid,99);
+
+figure;
+freqz(h,[1]);
+
+
+
+

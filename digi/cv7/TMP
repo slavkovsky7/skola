@@ -1,0 +1,59 @@
+%%%%%%%%JEDNOTKA%%%%%%%%
+
+a = [1, -1.8*cos(pi/16), +0.81];
+b = [1, 0.5];
+title('Kriticky bod je priblizne 512');
+freqz(b,a, 512, '', 20000);
+
+figure;
+b = [0.634, 0.634];
+a = [1, 0.268];
+freqz(b, a, 512,'',20000);
+title('Kriticky bod : nema');
+
+
+figure;
+b = [0.16, -0.48, 0.48, -0.16];
+a = [1, 0.13, 0.52, 0.3];
+freqz(b, a, 512,'',20000);
+title('Kriticky bod : nema');
+
+figure;
+b = [0.634, -0.634];
+a = [1, -0.268];
+freqz(b, a, 512,'',20000);
+title('Kriticky bod : nema');
+
+figure;
+b = [0.1, -0.5, 1];
+a = [1, -0.5, 0.1];
+freqz(b, a, 512,'',20000);
+title('Kriticky bod : nema');
+
+
+%%%%%%%%DVOJKA%%%%%%%%
+
+figure;
+[b,a] = butter(4, 3000/5000);
+freqz(b,a, 512, '', 10000 );
+
+figure;
+[b,a] = cheby1(4, 3, 3000/5000);
+freqz(b,a, 512, '', 10000 );
+
+figure;
+[b,a] = cheby2(4, 3, 3000/5000);
+freqz(b,a, 512, '', 10000 );
+
+figure;
+[b,a] = ellip(4, 3, 3, 3000/5000);
+freqz(b,a, 512, '', 10000 );
+
+%%%%%%TROJKA%%%%%%
+
+wl = 2*4000/20000;
+wh = 2*5000/20000;
+
+figure;
+[b, a] =  cheby1(4, 3, [wl, wh]);
+freqz(b, a, 512 ,'', 20000);

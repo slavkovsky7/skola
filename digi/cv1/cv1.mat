@@ -1,0 +1,37 @@
+mojafunkcia
+
+% one
+one = [ ones(1,3) ; zeros(3,3)] 
+
+% two
+plot(sin(0 : 0.01 : 4*pi))
+
+%three
+figure
+
+t=cputime;
+a = [-50:1:50];
+b = ones(1,size(a,2));
+mat = (a'*b)'.^2;
+mat=mat+mat';
+time=cputime-t
+mesh(a, a, sqrt(mat) )
+
+
+t=cputime;
+s = size(a,2)
+mat = zeros(s,s);
+for i = 1 : s
+  for j = 1 : s
+  	mat(i,j) = a(1,i)^2 + a(1,j)^2;
+  end
+end
+time2=cputime-t
+figure
+mesh(a, a, sqrt(mat) )
+
+
+%4
+figure
+hist(stdnormal_rnd(1,1000))
+

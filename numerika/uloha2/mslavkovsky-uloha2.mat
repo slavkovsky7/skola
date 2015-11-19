@@ -1,0 +1,53 @@
+
+function ret = l(j, x, xdata)
+	n = size(xdata,2);
+	ret = 1;
+	for i = 1 : n
+		if i ~= j
+			%printf('(%f - %f) / (%f - %f) \n', x, xdata(1,i), xdata(1,j), xdata(1,i));
+			ret = ret * ( x - xdata(1,i) ) / ( xdata(1,j) - xdata(1,i) );
+		end
+	end
+end
+
+function ret = p(x, xdata, ydata)
+	n = size(xdata,2);
+	ret = 0;
+	for j = 1 : n
+		ret = ret + ydata(1,j) * l(j,x,xdata);  
+	end
+end
+
+
+function [interx, intery] = interpolate(xdata, ydata, dx )
+	interx = [];
+	intery = [];
+	for x = xdata(1,1) : dx : xdata(1,end)
+		interx(end + 1) = x;
+		intery(end + 1) = p(x,xdata,ydata);
+	end
+end
+
+function do_interpolation(xdata, ydata)
+	figure();
+	hold all;
+	scatter(xdata, ydata, 20, 'r', 'filled')
+	[interx, intery] = interpolate(xdata, ydata, 0.1);
+	plot(  interx, intery )
+end
+
+function err = relative_error(y, y_apx )
+	err = abs( (y - y_apx) / y );
+end
+%do_interpolation([-2  0 1  2], [ 4 -2 1 -8])
+%do_interpolation([0  1 3  4   7],[1  3 49 129 813])
+
+
+xdata = [-9 -1 0 4 9];
+ydata = [36  2 0 4 18];
+
+do_interpolation(xdata, ydata)
+printf('Vysledky : \n')
+printf('\tb.) f(5)   = %f \n',  p(5, xdata, ydata) );
+printf('\tc.) rel(5) = %f \n', relative_error( 6.18034, p(5, xdata, ydata)) );
+%printf('f(5) = %f \n',  p(5, xdata, ydata) );

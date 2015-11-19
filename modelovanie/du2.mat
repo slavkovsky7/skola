@@ -1,0 +1,44 @@
+function y=f(x)
+	% Tu definuj analyticke riesenie svojej rovnice
+	%y = (25*exp(x)) / (54 - 4*exp(x));
+	a = 0.4;
+	c = -0.91629;
+	y = (-1 + sqrt(1 - 4*a*(x - exp(x+c)))) / 2*a;
+end
+
+function ret = df_dx(x,y)
+	% tu definuj povodnu nevyriesenu rovnicu
+	a = 0.4;
+	ret = x + y + a*y^2;
+	%ret = x + y + a*y^2;
+	%ret = y + 0.16 * y^2;
+end
+
+function [x,y] = runge_kutta(x, dx, y )
+	k1 = dx * df_dx(x,y);
+	k2 = dx * df_dx(x + dx/2, y + k1/2 );
+	k3 = dx * df_dx(x + dx/2, y + k2/2 );
+	x=x+dx;
+	k4 = dx * df_dx(x, y + k3 );
+	y = y + (1/6)*(k1 + 2*(k2 + k3) + k4);
+end
+
+dx=0.1
+x=0;
+y=0.5;
+printf('f(%f) = %f\n', x, y);
+[x,y]=runge_kutta(x,dx,y);
+printf('f(%f) = %f\n', x, y);
+[x,y]=runge_kutta(x,dx,y);
+printf('f(%f) = %f\n', x, y);
+[x,y]=runge_kutta(x,dx,y);
+printf('f(%f) = %f\n', x, y);
+[x,y]=runge_kutta(x,dx,y);
+printf('f(%f) = %f\n', x, y);
+
+printf('---------------\n');
+printf('f(%f) = %f\n', 0 , f(0) );
+printf('f(%f) = %f\n', 0.1 , f(0.1) );
+printf('f(%f) = %f\n', 0.2 , f(0.2) );
+printf('f(%f) = %f\n', 0.3 , f(0.3) );
+printf('f(%f) = %f\n', 0.4 , f(0.4) );

@@ -1,0 +1,81 @@
+function X = swap_row(X, i1, i2)
+	tmp=X(i2,:);
+	X(i2,:)=X(i1,:);
+	X(i1,:)=tmp;
+end
+
+function X = swap_col(X, i1, i2)
+	tmp=X(:,i2);
+	X(:,i2)=X(:,i1);
+	X(:,i1)=tmp;
+end
+
+function [X,y,p] = gauss(X,y)
+	
+	if abs(det(X)) < 0.00001
+		error('Input matrix is not singular or regular');
+	end 
+	n = min(size(X));
+	X = [X y'];
+	p = [1:1:n];
+	for i = 1 : n - 1
+		[max_v, max_i] = max(abs(X)(i:n,i));
+		X=swap_row(X,i,max_i + i - 1 );
+		p=swap_col(p,i,max_i + i - 1 );
+		for j=i+1 : n   
+			X(j,:) =  X(j,:) - X(i,:) * ( X(j,i)/X(i,i) );
+		end
+	end
+	y = X(:,n + 1)';
+	X = X(1:n, 1:n );
+end
+
+function ret = solve(X,y)
+	ret = zeros(1,size(y,2));
+	[X, y, p] = gauss(X,y);
+	n = size(X,1);
+	for i = n : -1 : 1
+		if i < n 
+			ret(1,i) = X(i, i+1:n) * ret(1, i+1:n)';
+		end
+		ret(1,i) = (y(1,i) - ret(1,i)) / X(i,i);
+	end
+end
+
+function ret = inverse(X)
+	if abs(det(X)) < 0.00001 || size(X,1) ~= size(X,1)
+		error('Input matrix is not singular or regular');
+	end 
+	n = size(X,1);
+	ret = zeros(n,n);
+	for i = 1 : n 
+		e = zeros(1,n);
+		e(1,i) = 1;
+		ret(:,i) = solve(X,e)';
+	end
+end
+
+
+% Test s nahodnymi maticami
+for i = 1 : 100
+	m=rand(5,5);
+	if sum(sum( inv(m) - inverse(m) )) > 0.0001
+	 	printf('------Test failed for------ : \n');
+	 	m
+	end 
+end
+
+% pisomna uloha
+printf('Vstupna matica : \n ')
+m=[ 1  2  2; 
+   -2  1 -1;
+    4  2 -1]
+
+printf('Moja inverzna matica : \n ')
+mm=inverse(m)
+
+printf('Octave inverzna matica : \n ')
+om=inv(m)
+
+printf('Rozdiel v sume: \n ')
+rozdiel = sum(sum(abs(mm) - abs(om)))

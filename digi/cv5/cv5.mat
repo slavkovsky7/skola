@@ -1,0 +1,66 @@
+function v = sinusoid(fs, f, omega, n)
+  v = zeros(n, 1);
+  n=1:n;
+  v(n) = sin(omega + (2*pi*f/fs).*n);
+end
+ 
+fs = 16000;
+N = 512;
+signal1 = sinusoid(fs,1000,0,N);
+
+figure;
+for f=1:10:1000
+  signal2 = sinusoid(fs,f,0,N);
+  signal = signal1 + signal2;
+  signal = signal .* boxcar(N);
+  windows = fs/N;
+  windows(1:N) = windows;
+  plot(abs(fft(signal))(2:256), "g", windows, "b");
+  title('Boxcar');
+  legend(num2str(f));
+  legend show;
+  usleep(200);
+end
+ 
+
+figure;
+for f=1:10:1000
+  signal2 = sinusoid(fs,f,0,N);
+  signal = signal1 + signal2;
+  signal = signal .* boxcar(N);
+  windows = 2*fs/N;;
+  windows(1:N) = windows;
+  plot(abs(fft(signal))(2:256), "r", windows, "b");
+  title('Hamming');
+  legend(num2str(f));
+  legend show;
+  usleep(200);
+end
+
+figure;
+for f=1:10:1000
+  signal2 = sinusoid(fs,f,0,N);
+  signal = signal1 + signal2;
+  signal = signal .* boxcar(N);
+  windows = 2*fs/N;;
+  windows(1:N) = windows;
+  plot(abs(fft(signal))(2:256), "r", windows, "b");
+  title('Hanning');
+  legend(num2str(f));
+  legend show;
+  usleep(200);
+end
+
+figure;
+for f=1:10:1000
+  signal2 = sinusoid(fs,f,0,N);
+  signal = signal1 + signal2;
+  signal = signal .* boxcar(N);
+  windows = 2*fs/N;;
+  windows(1:N) = windows;
+  plot(abs(fft(signal))(2:256), "r", windows, "b");
+  title('Triang');
+  legend(num2str(f));
+  legend show;
+  usleep(200);
+end

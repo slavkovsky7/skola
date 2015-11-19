@@ -1,0 +1,68 @@
+Build iface on CUDA-BA
+
+git clone image_tools repository
+
+vojdi do folderu image_tools a daj
+git submodule init
+git submodule update
+
+ruby configure_and_build.rb trg_hw=x86-64 trg_os=linux32 clean build
+
+Ak to jenme na caffe* tak chod do ext_libs, deletni zlozku caffe a nasledne sprav
+
+--------------------------------------------------------------------
+Build image_trans on CUDA-BA
+
+ruby configure_and_build.rb trg_hw=x86-64 trg_os=linux32 scenario=imgtrans build
+
+--------------------------------------------------------------------
+Build caffe on CUDA-BA
+
+ruby configure_and_build.rb trg_hw=x86-64 trg_os=linux32 scenario=caffe_train build
+
+--------------------------------------------------------------------
+Sablona na pripavu dat - tato seria scriptov:
+
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\00_definitions.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\01_create_db.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\02_split_traintest.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\03_normalize_train.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\07_enlarge_train.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\08_final_crop_train.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\09_split_into_folds.rb
+c:\projects\image_tools\tasks\035_icao_caffe_retrain\head_pose_03.01\10_add_gt.rb
+
+----------------------------------------------------------------------
+CAFFE training 
+
+Ako zdroj informacii a scriptov pozri aj \image_tools\tasks\035_icao_caffe_retrain\nose_shadow_02.01
+V podzlozke caffe_src su scripty na caffe training. Medzi casom mame uz aj centralnu verziu ktora je umiestnena v 
+image_tools\ml_framework\python\python_tools\caffe_tools\ (bude odladenejsia)   
+
+Treba si dobre skontrolovat cesty k caffe python a image_trans.py a imagetrans.so
+
+Kopirujem Ti ja nachystane nose shadow data (labels.csv a images.ivec) nad ktorymi si mozes skusit CAFFE data transforma a traiuning) 
+
+------------------
+Bacha v CAS-PEAL na bocne osvetlenia 
+left_down
+left_front
+left_up
+right_down
+right_front
+right_up
+
+Vyradil by som ich ...
+
+Stiahol by som si aj nejaku uplne nezavislu databazu napr: http://vis-www.cs.umass.edu/lfw/#explore
+Bacha obsahuje vela rozlicne natocenych tvari. Mame vyselektovcane tie frontalne v  \\samba\FaceDB\features_01\01\lfw_frontal_01.csv 
+
+Pomocou  https://github.com/Pletron/LFWgender dokazes skonvertovat mena na Gender.
+Alebo si najdi inu nezavislu Gender Databazu.
+
+
+
+ 
+
+
+ 
