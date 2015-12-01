@@ -1,0 +1,53 @@
+function y = f(x)
+	%y = x.^3 - x - 2;
+	%y = (5 + x + x.^2) / 2;
+	%y = cos(x);
+	%y = 2*cos(x) - x + x.^2;
+	y = 3*sin(x) - cos(x).^2 + x; 
+end
+
+function ret = step_number(a,b,epsilon)
+	ret = ceil(log2( (b-a) / epsilon) - 1);
+	%ret = (log(b-a) - log(epsilon)) / log(2) - 1;
+end 
+
+function s = bisect(a,b,val,epsilon)
+	a0 = a;
+	b0 = b;
+	s = (a + b) / 2;
+	n = 1;
+	while n < 100000
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		printf(' %d : f(%f) = %f\n', n, s, f(s));
+		x = [a0:0.1:b0];
+		clf('reset')
+		hold on;
+		plot(x, f(x), 'b');
+		plot([a,a], [0,f(a)], 'r');
+		plot([b,b], [0,f(b)], 'g');
+   		drawnow
+   		pause(0.1) %// pause 0.1 seconds to slow things down
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		if abs(f(s)-val) < epsilon
+			break
+		end
+
+		if (f(a)-val)*(f(s)-val) < 0
+			b = s;
+		else
+			a = s;
+		end
+		s = (a + b) / 2;
+		n=n+1;
+	end
+	n
+end
+
+a = -10;
+b = 5;
+epsilon = 10^-4;
+printf('Ocakavany pocet krokov = %d \n', step_number(a,b,epsilon));
+printf('-----Algoritmus-----\n')
+root = bisect(a,b,0,epsilon)
+printf('f(%f) = %f \n', root, f(root))
+printf('abs(5 - %f) = %f \n', f(root), abs(5 - f(root)));

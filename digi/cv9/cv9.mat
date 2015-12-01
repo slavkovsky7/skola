@@ -1,0 +1,48 @@
+addpath('/home/martin/workspace/skola/digi/inst')
+addpath('/home/martin/workspace/skola/digi/inst/private')
+addpath('/home/martin/workspace/skola/digi/control')
+
+
+function ret = sinusoid(fs, f, phase, n)
+	ret=zeros(1,n);
+	for i=1 : n
+		ret(1,i) =  sin(phase + ((2*pi*f)/fs)*i);
+	end
+end
+
+omega=2*pi*200;
+n=16000/50;
+variance=0.3;
+
+sinus1 = sinusoid(16000,200,pi, n);
+gaus_sum = randn(1,n) * variance;
+sinus2 = sinus1 + gaus_sum;
+
+T=1/16000;
+A = [ cos(omega*T), sin(omega*T);
+	  -sin(omega*T), cos(omega*T);];
+C = [1, 0];
+%R = diag([variance variance], 2, 2)
+R = variance;
+X = zeros(2,n);
+
+X(:,1) = [0;0];
+P = eye(2)*100000;
+
+for k = 2 : n
+	X(:,k) = A*X(:,k-1);
+	P = A*P*A';
+	K = P*C'*inv(C*P*C' + R);
+	X(:,k) = X(:,k) + K*( sinus2(k) - C*X(:,k) );
+	P = (eye(2) - K*C)*P;
+end
+
+figure;
+subplot(4,1,1)
+plot(sinus1)
+subplot(4,1,2)
+plot(sinus2)
+subplot(4,1,3)
+plot(X'(:,1))
+subplot(3,1,3)
+plot(X'(:,2))

@@ -1,0 +1,129 @@
+data =  [
+50 , 50 , 50;
+30 , 32 , 25;
+25,  30 , 30;
+35,  30 , 30
+] ;
+
+function ret = data_adjust(mat)
+	for i = 1 : size(mat,2)
+		ret(:,i) = mat(:,i) - mean(mat(:,i)); 
+	end
+end
+
+function print_sum(x)
+	for i = 1 : max(size(x))
+		if i > 1
+			printf(' + ');
+		end
+		printf('%f', x(i));
+	end
+	printf(' = %f \n', sum(x));
+end
+
+function ret = mean2(x)
+	%print_sum(x);
+	ret = sum(x);
+	ret = ret / max(size(x)); 
+end
+
+function ret = cov2(x,y)
+	printf('----------------------\n');
+	mean_x = mean2(x)
+	x = x'
+	
+	mean_y = mean2(y)
+	y = y'
+
+	x_adjusted = (x - mean_x)
+	y_adjusted = (y - mean_y)
+	x_y = (x - mean_x).*(y - mean_y)
+	sum_x_y = sum(x_y)
+	ret = (x - mean_x).*(y - mean_y);
+	ret = sum(ret) / (max(size(x)) - 1 );
+end
+
+function ret = cov2m(data)
+	ret = zeros(size(data,2),size(data,2));
+	for i = 1 : size(ret,1)
+		for j = i : size(ret,2)
+			ret(i,j) = cov2( data(:,i), data(:,j) );
+			ret(j,i) = ret(i,j)
+		end
+	end
+end
+
+
+%cov(data)
+%cov2m(data)
+
+
+
+function [a,b,c,d] = find_eigen_3x3(A)
+	a = 1;
+	b = A(1,1) + A(2,2) + A(3,3);
+	c = A(1,1)*A(2,2) + A(2,2)*A(3,3) + A(3,3)*A(1,1) - A(1,2)*A(2,1) - A(3,1)*A(1,3) - A(2,3)*A(3,2);
+	
+	%printf('1:%f\n', A(1,1)*A(2,2)*A(3,3));
+	%printf('2:%f\n', A(1,2)*A(2,3)*A(3,1));
+	%printf('3:%f\n', A(1,3)*A(2,1)*A(3,2));
+	%printf('4:%f\n', A(1,1)*A(2,3)*A(3,2));
+	%printf('5:%f\n', A(1,2)*A(2,1)*A(3,3));
+	%printf('6:%f\n', A(1,3)*A(3,1)*A(2,2));
+
+	d = A(1,1)*A(2,2)*A(3,3) + A(1,2)*A(2,3)*A(3,1) + A(1,3)*A(2,1)*A(3,2) - A(1,1)*A(2,3)*A(3,2) - A(1,2)*A(2,1)*A(3,3) - A(1,3)*A(3,1)*A(2,2);
+	
+	%printf('d:%f\n', d);
+
+	b = -b;
+	d = -d;
+end
+
+function x = solve_3rd_poly(a,b,c,d)
+
+
+	dscr = 18*a*b*c*d - 4*b^3*d + b^2*c^2 - 4*a*c^3 - 27*a^2*d^2;
+	b^2 
+	d_0 = b^2 - 3*a*c;
+	d_1 = 2*b^3 - 9*a*b*c + 27*a^2*d;
+
+	printf('d  = %f \n', dscr );
+	printf('d0 = %f \n', d_0 );
+	printf('d1 = %f \n', d_1 );
+
+	x = zeros(1,3);
+	if dscr == 0 && d_0 == 0
+		x(1) = x(2) = (x3) = -b/(3*a);
+	elseif dscr ==0 && d_0 ~= 0
+		x(1) = x(2) =  (9*a*d - b*c) / (2*d_0);
+		x(3) = (4*a*b*c - 9*a^2*d - b^3) / (a*d_0);
+	else
+		C = ( (d_1 + sqrt(-27*a^2*dscr)) / 2 ) ^ (1/3)
+		u = zeros(1,3);
+
+		u(1) = 1;
+		u(2) = (-1 + i*sqrt(3)) / 2;
+		u(3) = (-1 - i*sqrt(3)) / 2;
+
+		for k = 1 : 3
+			printf('============\n');
+			bb = b
+			uk_C = u(k)*C
+			d_0_uk_c = d_0 / (u(k)*C)
+			sums = (b + u(k)*C + d_0/(u(k)*C) )
+			sums = sums / (-3*a)
+			x(k) = (b + u(k)*C + d_0/(u(k)*C) ) / (-3*a); 
+		end
+	end
+end
+
+A = [ 1 -3 3; 3 -5 3; 6 -6 4; ];
+A = cov(data)
+[a,b,c,d] = find_eigen_3x3(A)
+printf('---------\n')
+
+
+lambda=solve_3rd_poly(a,b,c,d)'
+diag(lambda)
+printf('.........\n')
+[V, lambda] = eig(A)
