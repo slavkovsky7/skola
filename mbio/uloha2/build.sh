@@ -9,7 +9,7 @@ function build() {
   echo "---- Building ----"
   mkdir build
   cd build
-  cmake -DBOOST_ROOT="$BOOST" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "CodeLite - Unix Makefiles" ..
+  cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "CodeLite - Unix Makefiles" ..
   cmake --build . 
 }
 
