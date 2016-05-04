@@ -1,0 +1,3 @@
+/home/martin/workspace/skola/diplomovka/diplomovka_gui/build/CMakeFiles/edit_cache.dir
+/home/martin/workspace/skola/diplomovka/diplomovka_gui/build/CMakeFiles/rebuild_cache.dir
+/home/martin/workspace/skola/diplomovka/diplomovka_gui/build/CMakeFiles/diplomovka_gui.dir

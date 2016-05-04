@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="diplomovka_gui">
+  <Project Name="diplomovka_gui" Path="diplomovka_gui.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="diplomovka_gui" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
